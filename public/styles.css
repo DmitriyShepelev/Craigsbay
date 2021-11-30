@@ -4,3 +4,78 @@
   Section: CSE 154 AC and TODO: Add Jim's section.
   TODO: Add comments.
 */
+
+body {
+  background-color: white;
+  color: black;
+}
+
+h1 {
+  font-family: 'Comforter', cursive;
+}
+
+nav, #search-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+
+
+nav {
+  margin: 35px;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  text-align: center;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: large;
+  border-radius: 102px;
+  padding: 20px;
+  background-color: transparent;
+}
+
+button:hover {
+  background-color: green;
+  color: white;
+}
+
+nav button:hover {
+  background-color: black;
+  color: white;
+}
+
+h1, nav {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+form article {
+  margin-bottom: 20px;
+}
+
+.hidden {
+  display: none;
+}
+
+#search-term {
+  border-radius: 100px;
+  width: 400px;
+  padding-left: 20px;
+}
+
+#search-bar {
+  align-items: center;
+}
+
+#search-term {
+  height: 30px;
+}
+
+#search-btn:hover {
+  background-color: green;
+  color: white;
+}
