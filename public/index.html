@@ -15,6 +15,7 @@
   </head>
     <body>
     <header>
+      <p class='hidden'></p>
       <h1>Craigsbay</h1>
       <nav>
         <button id='home-btn'>Home</button>
@@ -24,72 +25,75 @@
     </header>
     <main>
       <section id='home'>
-        <div id='search-bar'>
+        <article id='search-bar'>
           <input id='search-term' type='text' placeholder='Search'>
           <button id='search-btn' type='button'>Search</button>
-        </div>
-        <div id='filters'>
-          <form>
-            <article id='price'>
-              <p>Price</p>
-              <input type='radio' name='price' value='0–50'>
-              <label>0–50</label>
-              <br>
-              <input type='radio' name='price' value='51–100'>
-              <label>51–100</label>
-              <br>
-              <input type='radio' name='price' value='101–150'>
-              <label>101–150</label>
-              <br>
-              <input type='radio' name='price' value='151–200'>
-              <label>151–200</label>
-            </article>
-            <article id='category'>
-              <p>Category</p>
-              <input type='radio' name='category' value='electronics'>
-              <label>Electronics</label>
-              <br>
-              <input type='radio' name='category' value='clothing'>
-              <label>Clothing</label>
-              <br>
-              <input type='radio' name='category' value='collectibles'>
-              <label>Collectibles</label>
-              <br>
-              <input type='radio' name='category' value='furniture'>
-              <label>Furniture</label>
-              <br>
-              <input type='radio' name='category' value='food'>
-              <label>Food</label>
-            </article>
-            <article id='rating'>
-              <p>Rating</p>
-              <input type='radio' name='rating' value='0+ stars'>
-              <label>0+ stars</label>
-              <br>
-              <input type='radio' name='rating' value='1+ stars'>
-              <label>1+ stars</label>
-              <br>
-              <input type='radio' name='rating' value='2+ stars'>
-              <label>2+ stars</label>
-              <br>
-              <input type='radio' name='rating' value='3+ stars'>
-              <label>3+ stars</label>
-              <br>
-              <input type='radio' name='rating' value='4+ stars'>
-              <label>4+ stars</label>
-              <br>
-              <input type='radio' name='rating' value='5 stars'>
-              <label>5 stars</label>
-            </article>
-            <button>Submit</button>
-        </form>
-        </div>
-        <article id='items'>
-
         </article>
+        <article id='content'>
+          <div id='filters'>
+            <form>
+              <article id='price'>
+                <p>Price</p>
+                <input type='radio' name='price' value='0–50'>
+                <label>0–50</label>
+                <br>
+                <input type='radio' name='price' value='51–100'>
+                <label>51–100</label>
+                <br>
+                <input type='radio' name='price' value='101–150'>
+                <label>101–150</label>
+                <br>
+                <input type='radio' name='price' value='151–200'>
+                <label>151–200</label>
+              </article>
+              <article id='category'>
+                <p>Category</p>
+                <input type='radio' name='category' value='electronics'>
+                <label>Electronics</label>
+                <br>
+                <input type='radio' name='category' value='clothing'>
+                <label>Clothing</label>
+                <br>
+                <input type='radio' name='category' value='collectibles'>
+                <label>Collectibles</label>
+                <br>
+                <input type='radio' name='category' value='furniture'>
+                <label>Furniture</label>
+                <br>
+                <input type='radio' name='category' value='food'>
+                <label>Food</label>
+              </article>
+              <article id='rating'>
+                <p>Rating</p>
+                <input type='radio' name='rating' value='0+ stars'>
+                <label>0+ stars</label>
+                <br>
+                <input type='radio' name='rating' value='1+ stars'>
+                <label>1+ stars</label>
+                <br>
+                <input type='radio' name='rating' value='2+ stars'>
+                <label>2+ stars</label>
+                <br>
+                <input type='radio' name='rating' value='3+ stars'>
+                <label>3+ stars</label>
+                <br>
+                <input type='radio' name='rating' value='4+ stars'>
+                <label>4+ stars</label>
+                <br>
+                <input type='radio' name='rating' value='5 stars'>
+                <label>5 stars</label>
+              </article>
+              <button>Submit</button>
+          </form>
+          </div>
+          <article id='items'>
+
+          </article>
+      </article>
       </section>
       <section id='transactions' class='hidden'>
-
+      <h2>Dogecoin:</h2>
+      <h2>Transactions:</h2>
       </section>
       <section id='create-account' class='hidden'>
 

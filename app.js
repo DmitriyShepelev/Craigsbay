@@ -28,7 +28,9 @@ app.use(express.json()); // Built-in middleware.
 // For multipart/form-data (required with FormData).
 app.use(multer().none()); // Requires the "multer" module.
 
-
+app.get('/items', async function (req, res) {
+  res.json([{'item_id': 2, 'quantity': 54, 'price': 44, 'category': 'Electronics', 'item_name': 'Computer', 'avg_score': 3.45}]);
+});
 
 /**
  * Establishes a database connection to the database and returns the database

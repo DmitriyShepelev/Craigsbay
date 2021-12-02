@@ -8,10 +8,23 @@
 body {
   background-color: white;
   color: black;
+  font-family: 'Gill Sans', sans-serif;
 }
 
 h1 {
   font-family: 'Comforter', cursive;
+}
+
+h2 {
+  text-align: center;
+}
+
+header {
+  position: relative;
+}
+
+hr {
+  border: 3 solid ;
 }
 
 nav, #search-bar {
@@ -20,7 +33,11 @@ nav, #search-bar {
   justify-content: center;
 }
 
-
+#content {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+}
 
 nav {
   margin: 35px;
@@ -30,7 +47,6 @@ button {
   cursor: pointer;
   border: none;
   text-align: center;
-  font-family: 'Times New Roman', Times, serif;
   font-size: large;
   border-radius: 102px;
   padding: 20px;
@@ -57,8 +73,24 @@ form article {
   margin-bottom: 20px;
 }
 
+header > p {
+  background-color: red;
+  left: 25%;
+  right: 25%;
+  text-align: center;
+  color: white;
+  position: fixed;
+  z-index: 2;
+  padding: 20px;
+}
+
 .hidden {
   display: none;
+}
+
+#items > article {
+  max-width: 300px;
+  max-height: 300px;
 }
 
 #search-term {
@@ -74,8 +106,35 @@ form article {
 #search-term {
   height: 30px;
 }
+.star-container {
+  overflow: hidden;
+}
+
+.star {
+  width: 75px;
+}
+
+article > img {
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+}
+
+article > p {
+  overflow-wrap: break-word;
+}
+
+#search-btn {
+  margin-left: 10px;
+}
 
 #search-btn:hover {
   background-color: green;
   color: white;
+}
+
+#items {
+  display: flex;
+  flex-direction: row;
+  margin-left: 40px;
 }
