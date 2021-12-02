@@ -32,6 +32,10 @@ app.get('/items', async function (req, res) {
   res.json([{'item_id': 2, 'quantity': 54, 'price': 44, 'category': 'Electronics', 'item_name': 'Computer', 'avg_score': 3.45}]);
 });
 
+app.get('/item', async function (req, res) {
+  res.json({'item_id': 2, 'quantity': 54, 'price': 44, 'category': 'Electronics', 'item_name': 'Computer', 'avg_score': 3.45, 'description': 'This is a computer.', 'feedbacks': [{'avg_score': 3.4, 'description': 'I LOVE THIS PRODUCT!'}]});
+})
+
 /**
  * Establishes a database connection to the database and returns the database
  * object. Any errors that occur should be caught in the function that calls this

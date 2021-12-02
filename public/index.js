@@ -46,34 +46,51 @@
 
   function displayItems(json) {
     for (let i = 0; i < json.length; i++) {
-      let item = document.createElement('article');
-      item.id = 'item' + json[i].item_id;
-      let itemPicture = document.createElement('img');
-      itemPicture.src = 'img/' + json[i].item_id + '.png';
-      itemPicture.alt = json[i].item_name;
-      itemPicture.addEventListener('click', requestSpecificItemDetails);
-      item.appendChild(itemPicture);
-      let itemName = document.createElement('p');
-      itemName.textContent = json[i].item_name;
-      item.appendChild(itemName);
-      let price = document.createElement('p');
-      price.textContent = '$' + json[i].price;
-      item.appendChild(price);
-      let category = document.createElement('p');
-      category.textContent = json[i].category;
-      item.appendChild(category);
-      let starDiv = document.createElement('div');
-      starDiv.classList.add('star-container');
-      let stars = document.createElement('img');
-      stars.classList.add('star');
-      stars.src = STARS;
-      stars.alt = 'stars';
-      starDiv.appendChild(stars);
-      starDiv.title = json[i].avg_score;
-      starDiv.style.width = STAR_WIDTH * json[i].avg_score / MAX_RATING + 'px';
-      item.appendChild(starDiv);
-      document.getElementById('items').appendChild(item);
+      document.getElementById('items').appendChild(constructItem(json[i]));
     }
+  }
+
+  function constructItem(json) {
+    let item = document.createElement('article');
+    item.id = 'item' + json.item_id;
+    let itemPicture = createImage(json);
+    itemPicture.addEventListener('click', requestSpecificItemDetails);
+    item.appendChild(itemPicture);
+    let itemName = document.createElement('p');
+    itemName.textContent = json.item_name;
+    item.appendChild(itemName);
+    let price = document.createElement('p');
+    price.textContent = '$' + json.price;
+    item.appendChild(price);
+    let category = document.createElement('p');
+    category.textContent = json.category;
+    item.appendChild(category);
+    item.appendChild(createStarRating(json));
+    let quantity = document.createElement('p');
+    quantity.textContent = json.quantity > 10 ? 'More than 10 available' : json.quantity +
+                           ' available';
+    item.appendChild(quantity);
+    return item
+  }
+
+  function createStarRating(json) {
+    let starDiv = document.createElement('div');
+    starDiv.classList.add('star-container');
+    let stars = document.createElement('img');
+    stars.classList.add('star');
+    stars.src = STARS;
+    stars.alt = 'stars';
+    starDiv.appendChild(stars);
+    starDiv.title = json.avg_score;
+    starDiv.style.width = STAR_WIDTH * json.avg_score / MAX_RATING + 'px';
+    return starDiv;
+  }
+
+  function createImage(json) {
+    let itemPicture = document.createElement('img');
+    itemPicture.src = 'img/' + json.item_id + '.png';
+    itemPicture.alt = json.item_name;
+    return itemPicture;
   }
 
   /**
@@ -90,7 +107,67 @@
   }
 
   function displaySpecificItemDetails(json) {
-
+    document.getElementById('items').classList.add('hidden');
+    let item = document.createElement('article');
+    let itemTitle = document.createElement('h2');
+    itemTitle.textContent = json.item_name;
+    item.appendChild(itemTitle);
+    let itemContainer = document.createElement('div');
+    itemContainer.id = 'itemContainer';
+    let itemPicture = createImage(json);
+    itemContainer.appendChild(itemPicture);
+    let descContainer = document.createElement('div');
+    let price = document.createElement('p');
+    price.textContent = 'Price: $' + json.price;
+    descContainer.appendChild(price);
+    descContainer.appendChild(createStarRating(json));
+    let form = document.createElement('form');
+    let textInput = document.createElement('input');
+    textInput.type = 'text';
+    textInput.min = '1';
+    textInput.max = json.quantity;
+    textInput.id = 'quantity';
+    form.appendChild(textInput);
+    let label = document.createElement('label');
+    label.for = textInput.id;
+    label.textContent = json.quantity > 10 ? ' More than 10 available' : json.quantity +
+    ' available';
+    form.appendChild(label);
+    descContainer.appendChild(form);
+    let category = document.createElement('p');
+    category.textContent = 'Category: ' + json.category;
+    descContainer.appendChild(category);
+    let buyBtn = document.createElement('button');
+    buyBtn.classList.add('green');
+    buyBtn.textContent = 'Buy';
+    descContainer.appendChild(buyBtn);
+    let description = document.createElement('p');
+    description.id = 'description';
+    description.textContent = 'Description:';
+    descContainer.appendChild(description);
+    let descriptionContent = document.createElement('p');
+    descriptionContent.textContent = json.description;
+    descContainer.appendChild(descriptionContent);
+    itemContainer.appendChild(descContainer);
+    item.appendChild(itemContainer);
+    let feedbacks = document.createElement('section');
+    feedbacks.id = 'feedbacks';
+    let reviews = document.createElement('h2');
+    reviews.textContent = 'Reviews:';
+    feedbacks.append(reviews);
+    for (let i = 0; i < json.feedbacks.length; i++) {
+      let feedback = document.createElement('article');
+      feedback.appendChild(createStarRating(json.feedbacks[i]));
+      if (json.feedbacks[i].description !== undefined) {
+        let feedbackContent = document.createElement('p');
+        feedbackContent.textContent = json.feedbacks[i].description;
+        feedback.appendChild(feedbackContent);
+      }
+      feedbacks.appendChild(feedback);
+    }
+    item.appendChild(feedbacks);
+    document.getElementById('item').appendChild(item);
+    document.getElementById('item').classList.remove('hidden');
   }
 
   function handleError(errorMessage) {
@@ -115,6 +192,8 @@
   function homeView() {
     document.getElementById('home').classList.remove('hidden');
     document.getElementById('transactions').classList.add('hidden');
+    document.getElementById('items').classList.remove('hidden');
+    document.getElementById('item').classList.add('hidden');
   }
 
   /**

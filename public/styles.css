@@ -84,10 +84,6 @@ header > p {
   padding: 20px;
 }
 
-.hidden {
-  display: none;
-}
-
 #items > article {
   max-width: 300px;
   max-height: 300px;
@@ -128,13 +124,41 @@ article > p {
   margin-left: 10px;
 }
 
+#quantity {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  width: 25px;
+}
+
+#feedbacks article {
+  border-bottom: 1px solid black;
+}
+
+#description {
+  font-weight: bold;
+}
+
 #search-btn:hover {
   background-color: green;
   color: white;
 }
 
-#items {
+#flex {
   display: flex;
   flex-direction: row;
   margin-left: 40px;
+}
+
+.green {
+  background-color: lightgreen;
+  color: black;
+}
+
+#itemContainer {
+  display: flex;
+  flex-direction: row;
+}
+
+.hidden {
+  display: none;
 }
