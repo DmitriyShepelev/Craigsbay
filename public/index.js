@@ -97,7 +97,7 @@
    *
    */
   function requestSpecificItemDetails() {
-    fetch(ITEM)
+    fetch(ITEM + this.src.substring(this.src.indexOf('img') + 4, this.src.lastIndexOf('.')))
       .then(statusCheck)
       .then(res => res.json())
       .then(displaySpecificItemDetails)
