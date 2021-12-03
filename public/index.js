@@ -60,7 +60,7 @@
     itemName.textContent = json.item_name;
     item.appendChild(itemName);
     let price = document.createElement('p');
-    price.textContent = '$' + json.price;
+    price.textContent = 'Ɖ' + json.price;
     item.appendChild(price);
     let category = document.createElement('p');
     category.textContent = json.category;
@@ -118,7 +118,7 @@
     itemContainer.appendChild(itemPicture);
     let descContainer = document.createElement('div');
     let price = document.createElement('p');
-    price.textContent = 'Price: $' + json.price;
+    price.textContent = 'Price: Ɖ' + json.price;
     descContainer.appendChild(price);
     descContainer.appendChild(createStarRating(json));
     let form = document.createElement('form');
