@@ -9,7 +9,6 @@
   "description": "For your final project you are tasked with creating a fully-fledged website. This full stack assignment will involve HTML, CSS, client-side JavaScript, server-side JavaScript, and a SQL database (**no file I/O allowed**). This assignment is a mix between a CP and a HW. Although there are specific requirements, like a HW, you have a lot of freedom in how you implement and design your website, like a CP. Since this is a full stack assignment, you might want to include your work in your portfolio. This is allowed, however, you should not post or share **any part** of this assignment until **after the assignment locks on Gradescope.**",
   "version": "1.0.0",
   "main": "app.js",
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
