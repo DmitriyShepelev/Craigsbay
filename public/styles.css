@@ -4,3 +4,157 @@
   Section: CSE 154 AC and TODO: Add Jim's section.
   TODO: Add comments.
 */
+
+body {
+  background-color: white;
+  color: black;
+  font-family: 'Gill Sans', sans-serif;
+}
+
+h1 {
+  font-family: 'Comforter', cursive;
+}
+
+h2 {
+  text-align: center;
+}
+
+header {
+  position: relative;
+}
+
+hr {
+  border: 3 solid ;
+}
+
+nav, #search-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+#content {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+}
+
+nav {
+  margin: 35px;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  text-align: center;
+  font-size: large;
+  border-radius: 102px;
+  padding: 20px;
+  background-color: transparent;
+}
+
+button:hover {
+  background-color: green;
+  color: white;
+}
+
+nav button:hover {
+  background-color: black;
+  color: white;
+}
+
+h1, nav {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+form article {
+  margin-bottom: 20px;
+}
+
+header > p {
+  background-color: red;
+  left: 25%;
+  right: 25%;
+  text-align: center;
+  color: white;
+  position: fixed;
+  z-index: 2;
+  padding: 20px;
+}
+
+#search-term {
+  border-radius: 100px;
+  width: 400px;
+  padding-left: 20px;
+}
+
+#search-bar {
+  align-items: center;
+}
+
+#search-term {
+  height: 30px;
+}
+.star-container {
+  overflow: hidden;
+}
+
+.star {
+  width: 75px;
+}
+
+article > img {
+  height: 300px;
+  width: 300px;
+  cursor: pointer;
+}
+
+article > p {
+  overflow-wrap: break-word;
+}
+
+#search-btn {
+  margin-left: 10px;
+}
+
+#quantity {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  width: 25px;
+}
+
+#feedbacks article {
+  border-bottom: 1px solid black;
+}
+
+#description {
+  font-weight: bold;
+}
+
+#search-btn:hover {
+  background-color: green;
+  color: white;
+}
+
+.flex {
+  display: flex;
+  flex-direction: row;
+  margin-left: 40px;
+  flex-wrap: wrap;
+}
+
+.green {
+  background-color: lightgreen;
+  color: black;
+}
+
+#itemContainer {
+  display: flex;
+  flex-direction: row;
+}
+
+.hidden {
+  display: none;
+}
