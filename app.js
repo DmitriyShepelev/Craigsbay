@@ -17,6 +17,7 @@ const app = express();
 const SPECIFIED_PORT = 8000;
 const SERVER_ERROR_NUM = 500;
 const REQUEST_ERROR_NUM = 400;
+const AVG_SCORE_QUERY = "SELECT AVG(score) AS avg_score FROM Feedbacks WHERE Feedbacks.item_id = ?";
 
 
 // For application/x-www-form-urlencoded.
@@ -30,9 +31,7 @@ app.use(multer().none()); // Requires the "multer" module.
 
 
 /**
- * Get all the items we have in the database if 
- * Otherwise, get all of the yips with a text that contains the value associated with
- * the "search" query paramter.
+ * Get all the items we have in the database.
  */
 app.get("/items", async (req, res) => {
   try {
@@ -47,13 +46,25 @@ app.get("/items", async (req, res) => {
 
 
 /**
- * Get all of the items from the Items table.
- * @returns {JSONObject} the JSON object representing all the yips that we get from
+ * Get all of the items from the Items table, along with their average score.
+ * @returns {JSONObject} the JSON object representing all the items that we get from
  *                       the table based on searchQuery.
  */
  async function getItemsFromTable() {
   let db = await getDBConnection();
-  let dbResult = await db.all("SELECT * FROM Items");
+  let dbResult = await db.all("SELECT item_id, quantity, price, category, item_name FROM Items");
+
+  for (let i = 0; i < dbResult.length; i++) {
+    let currItemID = dbResult[i].item_id;
+
+    let currAvgScore = await db.get(AVG_SCORE_QUERY, [currItemID]);
+
+    if (!currAvgScore.avg_score) {
+      currAvgScore = 5;
+    }
+
+    dbResult[i].avg_score = currAvgScore;
+  }
 
   await db.close();
   return dbResult;
