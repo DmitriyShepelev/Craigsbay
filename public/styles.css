@@ -33,10 +33,18 @@ nav, #search-bar {
   justify-content: center;
 }
 
+div#filters {
+  min-width: 120px;
+}
+
 #content {
   display: flex;
   flex-direction: row;
   justify-content: start;
+}
+
+#filters {
+  min-width: 100px;
 }
 
 nav {
@@ -71,6 +79,10 @@ h1, nav {
 
 form article {
   margin-bottom: 20px;
+}
+
+#filter {
+  width: 100%;
 }
 
 header > p {
@@ -111,8 +123,21 @@ article > img {
   cursor: pointer;
 }
 
-article > p {
+input[type='radio'] {
+  border-radius: 0%;
+}
+
+#itemContainer > img {
+  height: 400px;
+  width: 400px;
+}
+
+#items > article > p {
   overflow-wrap: break-word;
+}
+
+#items > article {
+  margin: 25px;
 }
 
 #search-btn {
@@ -153,6 +178,11 @@ article > p {
 #itemContainer {
   display: flex;
   flex-direction: row;
+  padding: 5px;
+}
+
+#itemContainer > img, #itemContainer > div {
+  padding: 30px;
 }
 
 .hidden {

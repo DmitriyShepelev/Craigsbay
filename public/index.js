@@ -15,6 +15,10 @@
 
   const MAX_RATING = 5.0;
 
+  const NUM_PRICE_RANGES = 4;
+
+  const NUM_CATEGORIES = 5;
+
   // Retrieved from http://clipart-library.com/clipart/riLo47oqT.htm
   const STARS = 'img/stars.png';
 
@@ -29,6 +33,55 @@
     requestItems();
     document.getElementById('accounts-btn').addEventListener('click', accountView);
     document.getElementById('home-btn').addEventListener('click', homeView);
+    document.querySelector('div#filters > form > button').addEventListener('click', (event) => {
+      event.preventDefault();
+      updateDisplayedItems();
+    });
+  }
+
+  function updateDisplayedItems() {
+
+    let notSelectedPrices = [];
+    let prices = document.querySelectorAll('article#price input:not(:checked)');
+    if (prices.length < NUM_PRICE_RANGES) {
+      for (let i = 0; i < prices.length; i++) {
+        let range = prices[i].value.split('–');
+        notSelectedPrices.push([parseInt(range[0]), parseInt(range[1])]);
+      }
+    }
+    console.log(notSelectedPrices);
+    let categories = document.querySelectorAll('article#category input:not(:checked)');
+    let notSelectedCategories = [];
+    if (categories.length < NUM_CATEGORIES) {
+      for (let i = 0; i < categories.length; i++) {
+        notSelectedCategories.push(categories[i].value.toUpperCase().charAt(0) +
+                                   categories[i].value.substring(1));
+      }
+    }
+    let checkedRating = document.querySelector('article#rating input:checked');
+    let rating = checkedRating === null ? 0 : checkedRating.value.charAt(0);
+    let items = document.querySelectorAll('#items > article');
+    for (let i = 0; i < items.length; i++) {
+      items[i].classList.remove('hidden');
+    }
+    outer:
+    for (let i = 0; i < items.length; i++) {
+      let price = items[i].querySelector('.price').textContent.substring(1);
+      for (let j = 0; j < notSelectedPrices.length; j++) {
+        if (price >= notSelectedPrices[j][0] && price <= notSelectedPrices[j][1]) {
+          items[i].classList.add('hidden');
+          continue outer;
+        }
+      }
+      let checkedTitle = items[i].querySelector('.star-container');
+      let title = checkedTitle === null ? 0 : checkedTitle.title;
+      console.log(title);
+      console.log(rating);
+      if (notSelectedCategories.includes(items[i].querySelector('.category').textContent)
+          || title < rating) {
+        items[i].classList.add('hidden');
+      }
+    }
   }
 
   /**
@@ -60,9 +113,11 @@
     itemName.textContent = json.item_name;
     item.appendChild(itemName);
     let price = document.createElement('p');
+    price.classList.add('price');
     price.textContent = 'Ɖ' + json.price;
     item.appendChild(price);
     let category = document.createElement('p');
+    category.classList.add('category');
     category.textContent = json.category;
     item.appendChild(category);
     item.appendChild(createStarRating(json));
@@ -118,6 +173,7 @@
     itemContainer.appendChild(itemPicture);
     let descContainer = document.createElement('div');
     let price = document.createElement('p');
+    price.classList.add('price');
     price.textContent = 'Price: Ɖ' + json.price;
     descContainer.appendChild(price);
     descContainer.appendChild(createStarRating(json));
@@ -136,6 +192,7 @@
     descContainer.appendChild(form);
     let category = document.createElement('p');
     category.textContent = 'Category: ' + json.category;
+    category.classList.add('category');
     descContainer.appendChild(category);
     let buyBtn = document.createElement('button');
     buyBtn.classList.add('green');
@@ -193,6 +250,7 @@
     document.getElementById('home').classList.remove('hidden');
     document.getElementById('transactions').classList.add('hidden');
     document.getElementById('items').classList.remove('hidden');
+    document.getElementById('item').innerHTML = '';
     document.getElementById('item').classList.add('hidden');
   }
 
