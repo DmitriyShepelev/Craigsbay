@@ -45,12 +45,17 @@ app.get("/items", async (req, res) => {
 });
 
 /**
- * Get all of the item ids that match the search query.
+ * Get all of the item ids that match the search query and the filters.
  */
-app.get("/search/:query", async (req, res) => {
+app.post("/search", async (req, res) => {
   try {
-    let searchQuery = req.params.query;
-    let resultItems = await getItemsBySearchQuery(searchQuery);
+    let resultItems = await getItemsBySearchAndFilter(
+      req.body["query"],
+      req.body["minCost"],
+      req.body["maxCost"],
+      req.body["category"],
+      req.body["rating"]
+    );
     res.json(resultItems);
   } catch (err) {
     res.type("text");
@@ -63,7 +68,6 @@ app.get("/search/:query", async (req, res) => {
  * Returns True id
  */
 app.post("/login", async (req, res) => {
-  res.type("text");
   try {
     if (req.body.user && req.body.password) {
       let db = await getDBConnection();
@@ -72,11 +76,12 @@ app.post("/login", async (req, res) => {
       await db.close();
 
       if (dbResult) {
-        res.send(dbResult["user_password"] === req.body.password);
+        res.json(dbResult["user_password"] === req.body.password);
       } else {
-        res.send("false");
+        res.json(false);
       }
     } else {
+      res.type("text");
       res.status(REQUEST_ERROR_NUM).send("Missing one or more of the required parameters.");
     }
   } catch (err) {
@@ -125,16 +130,65 @@ async function getItemsFromTable() {
 /**
  * Get the item ids of the items where the name of the item matches the "searchQuery"
  * @param {String} searchQuery - the search query we are getting the item id
+ * @param {Float} minCost - the minimum cost of an item in the result
+ * @param {Float} maxCost - the maximum cost of an item in the result
+ * @param {String} category - the category of the item we want in the result
+ * @param {Integer} rating - the minimum rating the item in the result must have
  * @returns {JSONObject} the JSON object representing all of the ids that we get from
  *                       the table that matches the searchQuery
  */
-async function getItemsBySearchQuery(searchQuery) {
+async function getItemsBySearchAndFilter(searchQuery, minCost, maxCost, category, rating) {
   let db = await getDBConnection();
-  let dbQuery = "SELECT item_id FROM Items WHERE item_name LIKE '%" + searchQuery + "%'";
-  let dbResult = await db.all(dbQuery);
+  let dbQuery = "SELECT item_id FROM Items";
+  let dbFilter = constructWhereFilters(searchQuery, minCost, maxCost, category, rating);
 
+  if (dbFilter.length > 0) {
+    dbQuery += " WHERE " + dbFilter[0];
+
+    for (let i = 1; i < dbFilter.length; i++) {
+      dbQuery += " AND " + dbFilter[i];
+    }
+  }
+
+  let dbResult = await db.all(dbQuery);
   await db.close();
-  return dbResult;
+
+  let dbResultRatingFiltered = [];
+  for (let i = 0; i < dbResult.length; i++) {
+    let avgScore = await getAverageScore(dbResult[i]["item_id"]);
+    if (rating === 0 || avgScore >= rating) {
+      dbResultRatingFiltered.push(dbResult[i]);
+    }
+  }
+  return dbResultRatingFiltered;
+}
+
+/**
+ * Construct a string array representing the filter in SQL format
+ * @param {String} searchQuery - the search query we are getting the item id
+ * @param {Float} minCost - the minimum cost of an item in the result
+ * @param {Float} maxCost - the maximum cost of an item in the result
+ * @param {String} category - the category of the item we want in the result
+ * @returns {String[]} string array where each element represents the clause to be
+ *                     added to the SQL query
+ */
+function constructWhereFilters(searchQuery, minCost, maxCost, category) {
+  let dbFilter = [];
+
+  if (searchQuery) {
+    dbFilter.push("item_name LIKE '%" + searchQuery + "%' ");
+  }
+  if (minCost) {
+    dbFilter.push("price >= " + minCost + " ");
+  }
+  if (maxCost) {
+    dbFilter.push("price <=" + maxCost + " ");
+  }
+  if (category) {
+    dbFilter.push("category = '" + category + "' ");
+  }
+
+  return dbFilter;
 }
 
 /**
@@ -169,12 +223,12 @@ async function getAverageScore(itemID) {
   let db = await getDBConnection();
   let avgScore = await db.get(AVG_SCORE_QUERY, [itemID]);
 
-  if (!avgScore.avg_score) {
-    avgScore = FULL_SCORE;
+  if (!avgScore["avg_score"]) {
+    avgScore["avg_score"] = FULL_SCORE;
   }
 
   db.close();
-  return avgScore;
+  return avgScore["avg_score"];
 }
 
 /**
