@@ -63,6 +63,10 @@ app.get("/item/:itemID", async (req, res) => {
   }
 });
 
+app.get('/search/:query', async (req, res) => {
+  res.json({'ids': [1, 2, 4]});
+})
+
 /**
  * Get all of the items from the Items table, along with their average score.
  * @returns {JSONObject} the JSON array representing all the items that we get from

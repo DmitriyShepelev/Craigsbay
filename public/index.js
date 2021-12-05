@@ -9,7 +9,9 @@
 
   const ITEMS = '/items';
 
-  const ITEM = 'item/';
+  const ITEM = '/item/';
+
+  const SEARCH = '/search/'
 
   const STAR_WIDTH = 75;
 
@@ -37,6 +39,58 @@
       event.preventDefault();
       updateDisplayedItems();
     });
+    document.getElementById('list').addEventListener('click', listView);
+    document.getElementById('grid').addEventListener('click', gridView);
+    document.getElementById('search-btn').addEventListener('click', search);
+  }
+
+  function search() {
+    if (document.getElementById('search-term').value !== '') {
+      fetch(SEARCH + document.getElementById('search-term').value)
+        .then(statusCheck)
+        .then(res => res.json())
+        .then(displaySearchResults)
+        .catch(() => {
+          handleError('Ooops. There was an error searching for ' +
+                      document.getElementById('search-term').value + '.');
+        })
+    }
+  }
+
+  function displaySearchResults(json) {
+    let items = document.querySelectorAll('#items > article');
+    for (let i = 0; i < items.length; i++) {
+      items[i].classList.remove('hidden');
+    }
+    for (let i = 0; i < items.length; i++) {
+      if (!json.ids.includes(parseInt(items[i].id))) {
+        items[i].classList.add('hidden');
+      }
+    }
+  }
+
+  function listView() {
+    document.getElementById('grid').classList.remove('selected');
+    document.getElementById('list').classList.add('selected');
+    document.getElementById('items').classList.remove('flex');
+    document.getElementById('items').classList.add('list');
+    let items = document.querySelectorAll('#items > article');
+    for (let i = 0; i < items.length; i++) {
+      items[i].classList.remove('list');
+      items[i].classList.add('flex');
+    }
+  }
+
+  function gridView() {
+    document.getElementById('items').classList.add('flex');
+    document.getElementById('items').classList.remove('list');
+    document.getElementById('grid').classList.add('selected');
+    document.getElementById('list').classList.remove('selected');
+    let items = document.querySelectorAll('#items > article');
+    for (let i = 0; i < items.length; i++) {
+      items[i].classList.add('list');
+      items[i].classList.remove('flex');
+    }
   }
 
   function updateDisplayedItems() {
@@ -105,26 +159,30 @@
 
   function constructItem(json) {
     let item = document.createElement('article');
-    item.id = 'item' + json.item_id;
+    item.classList.add('list');
+    item.id = json.item_id;
     let itemPicture = createImage(json);
     itemPicture.addEventListener('click', requestSpecificItemDetails);
     item.appendChild(itemPicture);
+    let viewDescContainer = document.createElement('div');
+    viewDescContainer.id = 'viewDescContainer';
     let itemName = document.createElement('p');
     itemName.textContent = json.item_name;
-    item.appendChild(itemName);
+    viewDescContainer.appendChild(itemName);
     let price = document.createElement('p');
     price.classList.add('price');
     price.textContent = 'Ɖ' + json.price;
-    item.appendChild(price);
+    viewDescContainer.appendChild(price);
     let category = document.createElement('p');
     category.classList.add('category');
     category.textContent = json.category;
-    item.appendChild(category);
-    item.appendChild(createStarRating(json));
+    viewDescContainer.appendChild(category);
+    viewDescContainer.appendChild(createStarRating(json));
     let quantity = document.createElement('p');
     quantity.textContent = json.quantity > 10 ? 'More than 10 available' : json.quantity +
                            ' available';
-    item.appendChild(quantity);
+    viewDescContainer.appendChild(quantity);
+    item.appendChild(viewDescContainer);
     return item
   }
 

@@ -45,6 +45,8 @@ div#filters {
 
 #filters {
   min-width: 100px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 nav {
@@ -123,6 +125,7 @@ article > img {
   cursor: pointer;
 }
 
+
 input[type='radio'] {
   border-radius: 0%;
 }
@@ -170,6 +173,12 @@ input[type='radio'] {
   flex-wrap: wrap;
 }
 
+.list {
+  display: flex;
+  flex-direction: column;
+  margin-left: 40px;
+}
+
 .green {
   background-color: lightgreen;
   color: black;
@@ -183,6 +192,19 @@ input[type='radio'] {
 
 #itemContainer > img, #itemContainer > div {
   padding: 30px;
+}
+
+.list > article > img {
+  padding-right: 30px;
+}
+
+article.list {
+  margin-left: 20%;
+}
+
+.selected, #layout > button:hover {
+  background-color: blue;
+  color: white;
 }
 
 .hidden {
