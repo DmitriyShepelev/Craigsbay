@@ -53,7 +53,29 @@ app.get("/search/:query", async (req, res) => {
     let resultItems = await getItemsBySearchQuery(searchQuery);
     res.json(resultItems);
   } catch (err) {
-    console.log(err)
+    res.type("text");
+    res.status(SERVER_ERROR_NUM).send("An error occurred on the server. Try again later.");
+  }
+});
+
+/**
+ * Get whether or not the login information has the right user name and the right password.
+ * Returns True id
+ */
+app.post("/login", async (req, res) => {
+  res.type("text");
+  try {
+    if (req.body.user && req.body.password) {
+      let db = await getDBConnection();
+      let getUserInfoQuery = "SELECT user_name, user_password FROM Accounts WHERE user_name = ?";
+      let dbResult = await db.get(getUserInfoQuery, req.body.user);
+      await db.close();
+
+      res.send(dbResult && dbResult["user_password"] === req.body.password);
+    } else {
+      res.status(REQUEST_ERROR_NUM).send("Missing one or more of the required parameters.");
+    }
+  } catch (err) {
     res.type("text");
     res.status(SERVER_ERROR_NUM).send("An error occurred on the server. Try again later.");
   }
@@ -70,8 +92,9 @@ app.get("/item/:itemID", async (req, res) => {
     if (!resultItem) {
       res.type("text");
       res.status(REQUEST_ERROR_NUM).send("Item with id of " + itemID + " does not exist.");
+    } else {
+      res.json(resultItem);
     }
-    res.json(resultItem);
   } catch (err) {
     res.type("text");
     res.status(SERVER_ERROR_NUM).send("An error occurred on the server. Try again later.");
