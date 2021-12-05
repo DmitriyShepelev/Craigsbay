@@ -71,7 +71,11 @@ app.post("/login", async (req, res) => {
       let dbResult = await db.get(getUserInfoQuery, req.body.user);
       await db.close();
 
-      res.send(dbResult && dbResult["user_password"] === req.body.password);
+      if (dbResult) {
+        res.send(dbResult["user_password"] === req.body.password);
+      } else {
+        res.send("false");
+      }
     } else {
       res.status(REQUEST_ERROR_NUM).send("Missing one or more of the required parameters.");
     }
