@@ -45,6 +45,21 @@ app.get("/items", async (req, res) => {
 });
 
 /**
+ * Get all of the item ids that match the search query.
+ */
+app.get("/search/:query", async (req, res) => {
+  try {
+    let searchQuery = req.params.query;
+    let resultItems = await getItemsBySearchQuery(searchQuery);
+    res.json(resultItems);
+  } catch (err) {
+    console.log(err)
+    res.type("text");
+    res.status(SERVER_ERROR_NUM).send("An error occurred on the server. Try again later.");
+  }
+});
+
+/**
  * Get the more detailed information about an item specified by the "itemID".
  */
 app.get("/item/:itemID", async (req, res) => {
@@ -65,8 +80,8 @@ app.get("/item/:itemID", async (req, res) => {
 
 /**
  * Get all of the items from the Items table, along with their average score.
- * @returns {JSONObject} the JSON array representing all the items that we get from
- *                       the table based on searchQuery.
+ * @returns {JSONObject} the JSON array representing all of the items that we get from
+ *                       the Items table.
  */
 async function getItemsFromTable() {
   let db = await getDBConnection();
@@ -75,6 +90,21 @@ async function getItemsFromTable() {
   for (let i = 0; i < dbResult.length; i++) {
     dbResult[i]["avg_score"] = await getAverageScore(dbResult[i].item_id);
   }
+
+  await db.close();
+  return dbResult;
+}
+
+/**
+ * Get the item ids of the items where the name of the item matches the "searchQuery"
+ * @param {String} searchQuery - the search query we are getting the item id
+ * @returns {JSONObject} the JSON object representing all of the ids that we get from
+ *                       the table that matches the searchQuery
+ */
+async function getItemsBySearchQuery(searchQuery) {
+  let db = await getDBConnection();
+  let dbQuery = "SELECT item_id FROM Items WHERE item_name LIKE '%" + searchQuery + "%'";
+  let dbResult = await db.all(dbQuery);
 
   await db.close();
   return dbResult;
