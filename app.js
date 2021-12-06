@@ -45,17 +45,12 @@ app.get("/items", async (req, res) => {
 });
 
 /**
- * Get all of the item ids that match the search query and the filters.
+ * Get all of the item ids that match the search query.
  */
-app.post("/search", async (req, res) => {
+app.get("/search/:query", async (req, res) => {
   try {
-    let resultItems = await getItemsBySearchAndFilter(
-      req.body["query"],
-      req.body["minCost"],
-      req.body["maxCost"],
-      req.body["category"],
-      req.body["rating"]
-    );
+    let searchQuery = req.params.query;
+    let resultItems = await getItemsBySearchQuery(searchQuery);
     res.json(resultItems);
   } catch (err) {
     res.type("text");
@@ -130,65 +125,22 @@ async function getItemsFromTable() {
 /**
  * Get the item ids of the items where the name of the item matches the "searchQuery"
  * @param {String} searchQuery - the search query we are getting the item id
- * @param {Float} minCost - the minimum cost of an item in the result
- * @param {Float} maxCost - the maximum cost of an item in the result
- * @param {String} category - the category of the item we want in the result
- * @param {Integer} rating - the minimum rating the item in the result must have
  * @returns {JSONObject} the JSON object representing all of the ids that we get from
  *                       the table that matches the searchQuery
  */
-async function getItemsBySearchAndFilter(searchQuery, minCost, maxCost, category, rating) {
+async function getItemsBySearchQuery(searchQuery) {
   let db = await getDBConnection();
-  let dbQuery = "SELECT item_id FROM Items";
-  let dbFilter = constructWhereFilters(searchQuery, minCost, maxCost, category, rating);
-
-  if (dbFilter.length > 0) {
-    dbQuery += " WHERE " + dbFilter[0];
-
-    for (let i = 1; i < dbFilter.length; i++) {
-      dbQuery += " AND " + dbFilter[i];
-    }
-  }
-
+  let dbQuery = "SELECT item_id FROM Items WHERE item_name LIKE '%" + searchQuery + "%'";
   let dbResult = await db.all(dbQuery);
-  await db.close();
 
-  let dbResultRatingFiltered = [];
+  let itemIdArr = [];
+
   for (let i = 0; i < dbResult.length; i++) {
-    let avgScore = await getAverageScore(dbResult[i]["item_id"]);
-    if (rating === 0 || avgScore >= rating) {
-      dbResultRatingFiltered.push(dbResult[i]);
-    }
-  }
-  return dbResultRatingFiltered;
-}
-
-/**
- * Construct a string array representing the filter in SQL format
- * @param {String} searchQuery - the search query we are getting the item id
- * @param {Float} minCost - the minimum cost of an item in the result
- * @param {Float} maxCost - the maximum cost of an item in the result
- * @param {String} category - the category of the item we want in the result
- * @returns {String[]} string array where each element represents the clause to be
- *                     added to the SQL query
- */
-function constructWhereFilters(searchQuery, minCost, maxCost, category) {
-  let dbFilter = [];
-
-  if (searchQuery) {
-    dbFilter.push("item_name LIKE '%" + searchQuery + "%' ");
-  }
-  if (minCost) {
-    dbFilter.push("price >= " + minCost + " ");
-  }
-  if (maxCost) {
-    dbFilter.push("price <=" + maxCost + " ");
-  }
-  if (category) {
-    dbFilter.push("category = '" + category + "' ");
+    itemIdArr.push(dbResult[i]["item_id"]);
   }
 
-  return dbFilter;
+  await db.close();
+  return itemIdArr;
 }
 
 /**
