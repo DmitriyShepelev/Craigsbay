@@ -33,10 +33,20 @@ nav, #search-bar {
   justify-content: center;
 }
 
+div#filters {
+  min-width: 120px;
+}
+
 #content {
   display: flex;
   flex-direction: row;
   justify-content: start;
+}
+
+#filters {
+  min-width: 100px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 nav {
@@ -48,7 +58,7 @@ button {
   border: none;
   text-align: center;
   font-size: large;
-  border-radius: 102px;
+  border-radius: 50px;
   padding: 20px;
   background-color: transparent;
 }
@@ -59,8 +69,13 @@ button:hover {
 }
 
 nav button:hover {
-  background-color: black;
+  background-color: lightskyblue;
   color: white;
+}
+
+#dropdown-cntr {
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
 }
 
 h1, nav {
@@ -73,7 +88,11 @@ form article {
   margin-bottom: 20px;
 }
 
-header > p {
+#filter {
+  width: 100%;
+}
+
+#error {
   background-color: red;
   left: 25%;
   right: 25%;
@@ -111,8 +130,22 @@ article > img {
   cursor: pointer;
 }
 
-article > p {
+
+input[type='radio'] {
+  border-radius: 0%;
+}
+
+#itemContainer > img {
+  height: 400px;
+  width: 400px;
+}
+
+#items > article > p {
   overflow-wrap: break-word;
+}
+
+#items > article {
+  margin: 25px;
 }
 
 #search-btn {
@@ -145,6 +178,26 @@ article > p {
   flex-wrap: wrap;
 }
 
+.list {
+  display: flex;
+  flex-direction: column;
+  margin-left: 40px;
+}
+
+.input-cntr, #sign-up form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#sign-up p {
+  text-align: center;
+}
+
+#sign-up label {
+  margin-top: 20px;
+}
+
 .green {
   background-color: lightgreen;
   color: black;
@@ -153,8 +206,80 @@ article > p {
 #itemContainer {
   display: flex;
   flex-direction: row;
+  padding: 5px;
+}
+
+#itemContainer > img, #itemContainer > div {
+  padding: 30px;
+}
+
+.list > article > img {
+  padding-right: 30px;
+}
+
+article.list {
+  margin-left: 20%;
+}
+
+.selected, #layout > button:hover {
+  background-color: blue;
+  color: white;
 }
 
 .hidden {
   display: none;
+}
+
+#dropdown {
+  position: absolute;
+  z-index: 1;
+}
+
+#dropdown-cntr:hover #accounts-btn {
+  background-color: lightskyblue;
+}
+
+#dropdown-cntr:hover #dropdown {
+  display: block;
+}
+
+#dropdown-cntr:hover, nav div button {
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+#user {
+  text-align: end;
+  margin-right: 20px;
+}
+
+.norm {
+  border-radius: 50px;
+}
+
+#sign-up-btn {
+  border-radius: 0px;
+}
+
+#dropdown > button {
+  width: 100%;
+}
+
+#login-btn {
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+}
+
+#sign-up-btn:hover, #login-btn:hover {
+  color: white;
+}
+
+nav div div button {
+  display: block;
+  color: black;
+  background-color: lightskyblue;
 }
