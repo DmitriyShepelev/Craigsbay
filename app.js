@@ -105,10 +105,6 @@ app.get("/item/:itemID", async (req, res) => {
   }
 });
 
-app.get('/search/:query', async (req, res) => {
-  res.json({'ids': [1, 2, 4]});
-})
-
 app.post('/createaccount', async (req, res) => {
   res.type('text').send('true');
 })

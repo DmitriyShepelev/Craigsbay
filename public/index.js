@@ -94,6 +94,7 @@
   }
 
   function displaySearchResults(json) {
+    console.log(json);
     let items = document.querySelectorAll('#items > article');
     for (let i = 0; i < items.length; i++) {
       items[i].classList.remove('hidden');
@@ -138,7 +139,6 @@
         notSelectedPrices.push([parseInt(range[0]), parseInt(range[1])]);
       }
     }
-    console.log(notSelectedPrices);
     let categories = document.querySelectorAll('article#category input:not(:checked)');
     let notSelectedCategories = [];
     if (categories.length < NUM_CATEGORIES) {
@@ -210,7 +210,7 @@
     category.classList.add('category');
     category.textContent = json.category;
     viewDescContainer.appendChild(category);
-    viewDescContainer.appendChild(createStarRating(json));
+    viewDescContainer.appendChild(createStarRating(json.avg_score));
     let quantity = document.createElement('p');
     quantity.textContent = json.quantity > 10 ? 'More than 10 available' : json.quantity +
                            ' available';
@@ -219,7 +219,7 @@
     return item
   }
 
-  function createStarRating(json) {
+  function createStarRating(score) {
     let starDiv = document.createElement('div');
     starDiv.classList.add('star-container');
     let stars = document.createElement('img');
@@ -227,8 +227,8 @@
     stars.src = STARS;
     stars.alt = 'stars';
     starDiv.appendChild(stars);
-    starDiv.title = json.avg_score;
-    starDiv.style.width = STAR_WIDTH * json.avg_score / MAX_RATING + 'px';
+    starDiv.title = score;
+    starDiv.style.width = STAR_WIDTH * score / MAX_RATING + 'px';
     return starDiv;
   }
 
@@ -267,7 +267,7 @@
     price.classList.add('price');
     price.textContent = 'Price: Ɖ' + json.price;
     descContainer.appendChild(price);
-    descContainer.appendChild(createStarRating(json));
+    descContainer.appendChild(createStarRating(json.avg_score));
     let form = document.createElement('form');
     let textInput = document.createElement('input');
     textInput.type = 'text';
@@ -305,10 +305,10 @@
     feedbacks.append(reviews);
     for (let i = 0; i < json.feedbacks.length; i++) {
       let feedback = document.createElement('article');
-      feedback.appendChild(createStarRating(json.feedbacks[i]));
-      if (json.feedbacks[i].description !== undefined) {
+      feedback.appendChild(createStarRating(json.feedbacks[i].score));
+      if (json.feedbacks[i].feedback_text !== undefined) {
         let feedbackContent = document.createElement('p');
-        feedbackContent.textContent = json.feedbacks[i].description;
+        feedbackContent.textContent = json.feedbacks[i].feedback_text;
         feedback.appendChild(feedbackContent);
       }
       feedbacks.appendChild(feedback);
