@@ -99,7 +99,7 @@
       items[i].classList.remove('hidden');
     }
     for (let i = 0; i < items.length; i++) {
-      if (!json.ids.includes(parseInt(items[i].id))) {
+      if (!json.includes(parseInt(items[i].id))) {
         items[i].classList.add('hidden');
       }
     }
@@ -164,8 +164,6 @@
       }
       let checkedTitle = items[i].querySelector('.star-container');
       let title = checkedTitle === null ? 0 : checkedTitle.title;
-      console.log(title);
-      console.log(rating);
       if (notSelectedCategories.includes(items[i].querySelector('.category').textContent)
           || title < rating) {
         items[i].classList.add('hidden');
