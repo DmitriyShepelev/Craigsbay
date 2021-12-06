@@ -18,9 +18,26 @@ const SPECIFIED_PORT = 8000;
 const SERVER_ERROR_NUM = 500;
 const REQUEST_ERROR_NUM = 400;
 const FULL_SCORE = 5;
-const AVG_SCORE_QUERY = "SELECT AVG(score) AS avg_score FROM Feedbacks WHERE item_id = ?";
+
+const MISSING_PARAMS = 'At least one POST parameter is missing.';
+
+const AVG_SCORE_QUERY = "SELECT AVG(score) AS avg_score FROM Feedbacks WHERE item_id = ?;";
 const GET_ITEM_FEEDBACK_QUERY = "SELECT user_name, score, feedback_text " +
-    "FROM Feedbacks WHERE item_id = ?";
+    "FROM Feedbacks WHERE item_id = ?;";
+
+const UPDATE_QUANTITY = 'UPDATE Items SET quantity = (SELECT ' +
+  'quantity FROM Items WHERE item_id = ?) - 1 WHERE item_id = ?;'
+
+const GET_BALANCE = 'SELECT balance FROM Accounts WHERE user_name = ?;'
+
+const CREATE_TXN = 'INSERT INTO Transactions (\'user_name\', \'item_id\', \'total_price\') ' +
+  'VALUES (?, ?, ?);'
+
+const UPDATE_BALANCE = 'UPDATE Accounts SET balance = ? WHERE user_name = ?;';
+
+const SERVER_ERROR_MSG = 'An error occurred on the server. Try again later.';
+
+const CREATE_FEEDBACK = 'INSERT INTO Feedbacks (\'item_id\', \'user_name\', \'score\', \'feedback_text\') VALUES (?, ?, ?, ?);';
 
 // For application/x-www-form-urlencoded.
 app.use(express.urlencoded({extended: true})); // Built-in middleware.
@@ -40,7 +57,7 @@ app.get("/items", async (req, res) => {
     res.json(resultItems);
   } catch (err) {
     res.type("text");
-    res.status(SERVER_ERROR_NUM).send("An error occurred on the server. Try again later.");
+    res.status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
   }
 });
 
@@ -54,7 +71,7 @@ app.get("/search/:query", async (req, res) => {
     res.json(resultItems);
   } catch (err) {
     res.type("text");
-    res.status(SERVER_ERROR_NUM).send("An error occurred on the server. Try again later.");
+    res.status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
   }
 });
 
@@ -77,11 +94,10 @@ app.post("/login", async (req, res) => {
       }
     } else {
       res.type("text");
-      res.status(REQUEST_ERROR_NUM).send("Missing one or more of the required parameters.");
+      res.status(REQUEST_ERROR_NUM).send(MISSING_PARAMS);
     }
   } catch (err) {
-    res.type("text");
-    res.status(SERVER_ERROR_NUM).send("An error occurred on the server. Try again later.");
+    res.type("text").status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
   }
 });
 
@@ -100,14 +116,127 @@ app.get("/item/:itemID", async (req, res) => {
       res.json(resultItem);
     }
   } catch (err) {
-    res.type("text");
-    res.status(SERVER_ERROR_NUM).send("An error occurred on the server. Try again later.");
+    res.type("text").status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
   }
 });
 
+/**
+ * Creates an account with a username, password, and email.
+ */
 app.post('/createaccount', async (req, res) => {
-  res.type('text').send('true');
-})
+  if (req.body.username === undefined || req.body.password == undefined ||
+      req.body.email === undefined) {
+    res.type('text').status(REQUEST_ERROR_NUM).send(MISSING_PARAMS);
+  } else {
+    try {
+      let db = await getDBConnection();
+      let dbResult = await db.get('SELECT * FROM Accounts WHERE user_name = ?;',
+                                  req.body.username);
+      if (dbResult !== undefined) {
+        db.close();
+        res.type('text').status(REQUEST_ERROR_NUM).send(req.body.username +
+          ' already exists.');
+      } else {
+        await db.run('INSERT INTO accounts (\'user_name\', \'user_password\', \'email\')' +
+                     ' VALUES (?, ?, ?);', req.body.username, req.body.password, req.body.email);
+        db.close();
+        res.type('text').send('Success!');
+      }
+    } catch (error) {
+      res.type("text").status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
+    }
+  }
+});
+
+/**
+ * Allows a user to buy an item.
+ */
+app.post('/buy/:itemID/:username', async (req, res) => {
+  try {
+    let db = await getDBConnection();
+    let metadata = await db.run(UPDATE_QUANTITY, req.params.itemID, req.params.itemID);
+    if (metadata.changes === 0) {
+      db.close();
+      res.type('text').status(REQUEST_ERROR_NUM).send('Item #' + req.params.itemID
+        + ' does not exist.');
+    } else {
+      let balance = await db.get(GET_BALANCE, req.params.username);
+      let itemPrice = await db.get('SELECT price FROM Items WHERE item_id = ?', req.params.itemID);
+      if (balance.balance < itemPrice.price) {
+        db.close();
+        res.type('text').status(REQUEST_ERROR_NUM).send('You only have Ɖ' + balance.balance +
+          ' but item#' + req.params.itemID + ' costs Ɖ' + itemPrice.price + '.');
+      } else {
+        balance = await transact(db, req.params.username, req.params.itemID, itemPrice.price,
+          balance.balance);
+        res.type('text').send('' + balance);
+      }
+    }
+  } catch (error) {
+    res.type("text").status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
+  }
+});
+
+/**
+ * Get a user's transactions.
+ */
+app.get('/transactions/:username', async (req, res) => {
+  try {
+    let db = await getDBConnection();
+    let transactions = await db.all('SELECT transaction_id, item_id, ' +
+      ' total_price, transaction_date FROM Transactions WHERE user_name = ?' +
+      ' ORDER BY DATETIME(transaction_date) DESC;', req.params.username);
+    db.close();
+    res.json(transactions);
+  } catch (error) {
+    res.type("text").status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
+  }
+});
+
+/**
+ * Submit feedback containing the username, score, and feedback text.
+ */
+app.post('/feedback', async (req, res) => {
+  if (req.body.username === undefined || req.body.score === undefined
+      || req.body.description === undefined || req.body.id == undefined) {
+    res.type('text').status(REQUEST_ERROR_NUM).send(MISSING_PARAMS);
+  } else {
+    try {
+      let db = await getDBConnection();
+      let userExists = await db.get('SELECT * FROM Accounts WHERE user_name = ?;',
+        req.body.username);
+      let itemExists = await db.get('SELECT * FROM Items WHERE item_id = ?;', req.body.id);
+      if (userExists === undefined || itemExists === undefined) {
+        db.close();
+        res.type('text').status(REQUEST_ERROR_NUM).send('Your username or item ID does not exist.');
+      } else {
+        await db.run(CREATE_FEEDBACK, req.body.id, req.body.username,
+          req.body.score, req.body.description);
+        db.close();
+        res.type('text').send('Success!');
+      }
+    } catch (error) {
+      res.type("text").status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
+    }
+  }
+});
+
+/**
+ * Completes a transaction by logging the transaction and updates the user's balance.
+ * @param {object} db the database object.
+ * @param {string} username the username.
+ * @param {number} itemID the item ID.
+ * @param {number} price the item's price.
+ * @param {number} balance the user's balance before the transaction.
+ * @returns {number} balance representing the user's balance after the transaction.
+ */
+async function transact(db, username, itemID, price, balance) {
+  await db.run(CREATE_TXN, username, itemID, price);
+  await db.run(UPDATE_BALANCE, balance - price, username);
+  let userBalance = await db.get(GET_BALANCE, username);
+  db.close();
+  return userBalance.balance;
+}
 
 /**
  * Get all of the items from the Items table, along with their average score.

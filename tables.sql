@@ -10,7 +10,8 @@ CREATE TABLE Items (
 CREATE TABLE Accounts (
   user_name TEXT PRIMARY KEY NOT NULL,
   user_password TEXT,
-  email TEXT
+  email TEXT,
+  balance REAL DEFAULT 2500
 );
 
 CREATE TABLE Feedbacks (
@@ -23,12 +24,12 @@ CREATE TABLE Feedbacks (
   FOREIGN KEY (user_name) REFERENCES Accounts(user_name)
 );
 
-CREATE TABLE Transanctions (
-  transanction_id INTEGER PRIMARY KEY AUTOINCREMENT,
+CREATE TABLE Transactions (
+  transaction_id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_name TEXT,
   item_id INTEGER,
   total_price REAL,
-  transanction_date TEXT,
+  transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_name) REFERENCES Accounts(user_name),
   FOREIGN KEY (item_id) REFERENCES Items(item_id)
 );
