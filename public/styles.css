@@ -58,7 +58,7 @@ button {
   border: none;
   text-align: center;
   font-size: large;
-  border-radius: 102px;
+  border-radius: 50px;
   padding: 20px;
   background-color: transparent;
 }
@@ -69,8 +69,13 @@ button:hover {
 }
 
 nav button:hover {
-  background-color: black;
+  background-color: lightskyblue;
   color: white;
+}
+
+#dropdown-cntr {
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
 }
 
 h1, nav {
@@ -87,7 +92,7 @@ form article {
   width: 100%;
 }
 
-header > p {
+#error {
   background-color: red;
   left: 25%;
   right: 25%;
@@ -179,6 +184,20 @@ input[type='radio'] {
   margin-left: 40px;
 }
 
+.input-cntr, #sign-up form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#sign-up p {
+  text-align: center;
+}
+
+#sign-up label {
+  margin-top: 20px;
+}
+
 .green {
   background-color: lightgreen;
   color: black;
@@ -209,4 +228,58 @@ article.list {
 
 .hidden {
   display: none;
+}
+
+#dropdown {
+  position: absolute;
+  z-index: 1;
+}
+
+#dropdown-cntr:hover #accounts-btn {
+  background-color: lightskyblue;
+}
+
+#dropdown-cntr:hover #dropdown {
+  display: block;
+}
+
+#dropdown-cntr:hover, nav div button {
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+#user {
+  text-align: end;
+  margin-right: 20px;
+}
+
+.norm {
+  border-radius: 50px;
+}
+
+#sign-up-btn {
+  border-radius: 0px;
+}
+
+#dropdown > button {
+  width: 100%;
+}
+
+#login-btn {
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+}
+
+#sign-up-btn:hover, #login-btn:hover {
+  color: white;
+}
+
+nav div div button {
+  display: block;
+  color: black;
+  background-color: lightskyblue;
 }

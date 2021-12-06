@@ -13,6 +13,8 @@
 
   const SEARCH = '/search/'
 
+  const CREATE_ACCOUNT = '/createaccount'
+
   const STAR_WIDTH = 75;
 
   const MAX_RATING = 5.0;
@@ -42,10 +44,44 @@
     document.getElementById('list').addEventListener('click', listView);
     document.getElementById('grid').addEventListener('click', gridView);
     document.getElementById('search-btn').addEventListener('click', search);
+    document.getElementById('sign-up-btn').addEventListener('click', signUp);
+    document.querySelector('#sign-up button').addEventListener('click', (event) => {
+      event.preventDefault();
+      createAccount();
+    });
+  }
+
+  function createAccount() {
+    let data = new FormData();
+    data.append('username', document.getElementById('username').value);
+    data.append('password', document.getElementById('password').value);
+    data.append('email', document.getElementById('email').value);
+    fetch(CREATE_ACCOUNT, {method: 'POST', body: data})
+      .then(statusCheck)
+      .then(() => displayLoggedIn(document.getElementById('username').value))
+      .catch((error) => handleError(error.message));
+  }
+
+  function displayLoggedIn(username) {
+    document.getElementById('dropdown').classList.add('hidden');
+    document.getElementById('user').textContent = 'Logged in as ' + username;
+    document.getElementById('user').classList.remove('hidden');
+    document.getElementById('sign-up').classList.add('hidden');
+    document.getElementById('home').classList.remove('hidden');
+    document.getElementById('sign-up-btn').classList.add('hidden');
+    document.getElementById('login-btn').classList.add('hidden');
+    document.getElementById('dropdown-cntr').classList.add('norm');
+    document.getElementById('accounts-btn').classList.add('norm');
+  }
+
+  function signUp() {
+    document.getElementById('sign-up').classList.remove('hidden');
+    document.getElementById('home').classList.add('hidden');
+    document.getElementById('transactions').classList.add('hidden');
   }
 
   function search() {
-    if (document.getElementById('search-term').value !== '') {
+    if (document.getElementById('search-term').value.trim() !== '') {
       fetch(SEARCH + document.getElementById('search-term').value)
         .then(statusCheck)
         .then(res => res.json())
@@ -94,7 +130,6 @@
   }
 
   function updateDisplayedItems() {
-
     let notSelectedPrices = [];
     let prices = document.querySelectorAll('article#price input:not(:checked)');
     if (prices.length < NUM_PRICE_RANGES) {
@@ -286,10 +321,10 @@
   }
 
   function handleError(errorMessage) {
-    document.querySelector('header > p').textContent = errorMessage;
-    document.querySelector('header > p').classList.remove('hidden');
+    document.getElementById('error').textContent = errorMessage;
+    document.getElementById('error').classList.remove('hidden');
     setTimeout(function() {
-      document.querySelector('header > p').classList.add('hidden');
+      document.getElementById('error').classList.add('hidden');
     }, TWO_SECS);
   }
 
@@ -310,6 +345,7 @@
     document.getElementById('items').classList.remove('hidden');
     document.getElementById('item').innerHTML = '';
     document.getElementById('item').classList.add('hidden');
+    document.getElementById('sign-up').classList.add('hidden');
   }
 
   /**

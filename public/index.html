@@ -15,18 +15,27 @@
   </head>
     <body>
     <header>
-      <p class='hidden'></p>
-      <h1>Craigsbay</h1>
+      <p id='error' class='hidden'></p>
+      <div id='top-cntr' class='flex'>
+        <h1>Craigsbay</h1>
+        <p id='user' class='hidden'></p>
+      </div>
       <nav>
         <button id='home-btn'>Home</button>
-        <button id='accounts-btn'>Account</button>
+        <div id='dropdown-cntr'>
+          <button id='accounts-btn'>Account</button>
+          <div id='dropdown' class='hidden'>
+            <button id='sign-up-btn'>Sign Up</button>
+            <button id='login-btn'>Login</button>
+          </div>
+        </div>
       </nav>
       <hr>
     </header>
     <main>
       <section id='home'>
         <article id='search-bar'>
-          <input id='search-term' type='text' placeholder='Search'>
+          <input id='search-term' type='text' placeholder='Search' required>
           <button id='search-btn' class='green' type='button'>Search</button>
         </article>
         <article id='layout'>
@@ -116,8 +125,25 @@
       <h2>Dogecoin:</h2>
       <h2>Transactions:</h2>
       </section>
-      <section id='create-account' class='hidden'>
+      <section id='sign-up' class='hidden'>
+        <h2>SIGN UP</h2>
+        <p>Usernames <strong>must</strong> contain <em>at least</em> one character.</p>
+        <p>Passwords <strong>must</strong> contain <em>at least</em> six characters.</p>
+        <form>
+          <label>
+            Username <div class='input-cntr'><br><input id='username' type='text' name='sign-up' required></div>
+          </label>
 
+          <label>
+            Password <div class='input-cntr'><br><input id='password' type='password' name='sign-up' required></div>
+          </label>
+          <br>
+          <label>
+            Email <div class='input-cntr'><br><input id='email' type='email' name='sign-up' required></div>
+          </label>
+          <br>
+          <button class='green'>Submit</button>
+        </form>
       </section>
       <section id='login' class='hidden'>
 
