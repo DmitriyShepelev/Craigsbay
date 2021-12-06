@@ -45,6 +45,47 @@ app.get("/items", async (req, res) => {
 });
 
 /**
+ * Get all of the item ids that match the search query.
+ */
+app.get("/search/:query", async (req, res) => {
+  try {
+    let searchQuery = req.params.query;
+    let resultItems = await getItemsBySearchQuery(searchQuery);
+    res.json(resultItems);
+  } catch (err) {
+    res.type("text");
+    res.status(SERVER_ERROR_NUM).send("An error occurred on the server. Try again later.");
+  }
+});
+
+/**
+ * Get whether or not the login information has the right user name and the right password.
+ * Returns True id
+ */
+app.post("/login", async (req, res) => {
+  try {
+    if (req.body.user && req.body.password) {
+      let db = await getDBConnection();
+      let getUserInfoQuery = "SELECT user_name, user_password FROM Accounts WHERE user_name = ?";
+      let dbResult = await db.get(getUserInfoQuery, req.body.user);
+      await db.close();
+
+      if (dbResult) {
+        res.json(dbResult["user_password"] === req.body.password);
+      } else {
+        res.json(false);
+      }
+    } else {
+      res.type("text");
+      res.status(REQUEST_ERROR_NUM).send("Missing one or more of the required parameters.");
+    }
+  } catch (err) {
+    res.type("text");
+    res.status(SERVER_ERROR_NUM).send("An error occurred on the server. Try again later.");
+  }
+});
+
+/**
  * Get the more detailed information about an item specified by the "itemID".
  */
 app.get("/item/:itemID", async (req, res) => {
@@ -55,8 +96,9 @@ app.get("/item/:itemID", async (req, res) => {
     if (!resultItem) {
       res.type("text");
       res.status(REQUEST_ERROR_NUM).send("Item with id of " + itemID + " does not exist.");
+    } else {
+      res.json(resultItem);
     }
-    res.json(resultItem);
   } catch (err) {
     res.type("text");
     res.status(SERVER_ERROR_NUM).send("An error occurred on the server. Try again later.");
@@ -73,8 +115,8 @@ app.post('/createaccount', async (req, res) => {
 
 /**
  * Get all of the items from the Items table, along with their average score.
- * @returns {JSONObject} the JSON array representing all the items that we get from
- *                       the table based on searchQuery.
+ * @returns {JSONObject} the JSON array representing all of the items that we get from
+ *                       the Items table.
  */
 async function getItemsFromTable() {
   let db = await getDBConnection();
@@ -86,6 +128,27 @@ async function getItemsFromTable() {
 
   await db.close();
   return dbResult;
+}
+
+/**
+ * Get the item ids of the items where the name of the item matches the "searchQuery"
+ * @param {String} searchQuery - the search query we are getting the item id
+ * @returns {JSONObject} the JSON object representing all of the ids that we get from
+ *                       the table that matches the searchQuery
+ */
+async function getItemsBySearchQuery(searchQuery) {
+  let db = await getDBConnection();
+  let dbQuery = "SELECT item_id FROM Items WHERE item_name LIKE '%" + searchQuery + "%'";
+  let dbResult = await db.all(dbQuery);
+
+  let itemIdArr = [];
+
+  for (let i = 0; i < dbResult.length; i++) {
+    itemIdArr.push(dbResult[i]["item_id"]);
+  }
+
+  await db.close();
+  return itemIdArr;
 }
 
 /**
@@ -120,12 +183,12 @@ async function getAverageScore(itemID) {
   let db = await getDBConnection();
   let avgScore = await db.get(AVG_SCORE_QUERY, [itemID]);
 
-  if (!avgScore.avg_score) {
-    avgScore = FULL_SCORE;
+  if (!avgScore["avg_score"]) {
+    avgScore["avg_score"] = FULL_SCORE;
   }
 
   db.close();
-  return avgScore;
+  return avgScore["avg_score"];
 }
 
 /**
