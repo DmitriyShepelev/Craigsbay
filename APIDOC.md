@@ -267,7 +267,7 @@ text message `An error occurred on the server. Try again later.`.
 `Success!`
 
 **Error Handling:**
-* `400` error: If the `username` or item with ID `id` does not exit, return an
+* `400` error: If the `username` or item with ID `id` does not exist, return an
 error with the plain text message `Your username or item ID does not exist.`
 
 * `500` error: If there is a server-side error, return an error with the plain
