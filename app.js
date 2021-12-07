@@ -1,8 +1,12 @@
 /*
  * Name: Dmitriy Shepelev and Jim Supawish
  * Date: November 29, 2021
- * Section: CSE 154 AC and TODO: Add Jim's section.
- * TODO: Add comments.
+ * Section: CSE 154 AC
+ * This is the JavaScript to support the Craigsbay website and API. With a GET
+ * request, users can retrieve all items, details about a specific item, items
+ * matching a search query, and a transaction history. With a POST request,
+ * users can submit feedback, buy an item, create an account, and verify login
+ * information.
  */
 
 'use strict';
@@ -32,13 +36,12 @@ const AVG_SCORE_QUERY = 'SELECT AVG(score) AS avg_score FROM Feedbacks WHERE ite
 const GET_ITEM_FEEDBACK_QUERY = 'SELECT user_name, score, feedback_text ' +
     'FROM Feedbacks WHERE item_id = ?;';
 
-const UPDATE_QUANTITY = 'UPDATE Items SET quantity = (SELECT ' +
-  'quantity FROM Items WHERE item_id = ?) - 1 WHERE item_id = ?;';
+const UPDATE_QUANTITY = 'UPDATE Items SET quantity = ? WHERE item_id = ?;';
 
 const GET_BALANCE = 'SELECT balance FROM Accounts WHERE user_name = ?;';
 
-const CREATE_TXN = 'INSERT INTO Transactions (\'user_name\', \'item_id\', \'total_price\') ' +
-  'VALUES (?, ?, ?);';
+const CREATE_TXN = 'INSERT INTO Transactions (\'user_name\', \'item_id\', \'total_price\',' +
+                   '\'quantity\') VALUES (?, ?, ?, ?);';
 
 const UPDATE_BALANCE = 'UPDATE Accounts SET balance = ? WHERE user_name = ?;';
 
@@ -148,7 +151,7 @@ app.post('/createaccount', async (req, res) => {
         res.type('text').status(REQUEST_ERROR_NUM)
           .send(req.body.username + ' already exists.');
       } else {
-        await db.run('INSERT INTO accounts (\'user_name\', \'user_password\', \'email\')' +
+        await db.run('INSERT INTO Accounts (\'user_name\', \'user_password\', \'email\')' +
                      ' VALUES (?, ?, ?);', [req.body.username, req.body.password, req.body.email]);
         db.close();
         res.type('text').send('Success!');
@@ -163,27 +166,24 @@ app.post('/createaccount', async (req, res) => {
 /**
  * Allows a user to buy an item.
  */
-app.post('/buy/:itemID/:username', async (req, res) => {
+app.post('/buy/:itemID/:username/:quantity', async (req, res) => {
   try {
     let db = await getDBConnection();
-    let metadata = await db.run(UPDATE_QUANTITY, [req.params.itemID, req.params.itemID]);
-    if (metadata.changes === 0) {
-      db.close();
+    let itemID = req.params.itemID;
+    let quantity = req.params.quantity;
+    let username = req.params.username;
+    let currQuantity = await db.get('SELECT quantity FROM Items WHERE item_id = ?;', [itemID]);
+    let balance = await db.get(GET_BALANCE, [username]);
+    let itemPrice = await db.get(GET_PRICE, [itemID]);
+    let errResult = handleTransactErrors(db, currQuantity, quantity, balance, itemPrice, itemID,
+                                         username);
+    if (errResult !== '') {
       res.type('text').status(REQUEST_ERROR_NUM)
-        .send('Item #' + req.params.itemID + ' does not exist.');
+        .send(errResult);
     } else {
-      let username = req.params.username;
-      let balance = await db.get(GET_BALANCE, [username]);
-      let itemPrice = await db.get(GET_PRICE, [req.params.itemID]);
-      if (balance.balance < itemPrice.price) {
-        db.close();
-        res.type('text').status(REQUEST_ERROR_NUM)
-          .send('You only have Ɖ' + balance.balance + ' but item#' +
-          req.params.itemID + ' costs Ɖ' + itemPrice.price + '.');
-      } else {
-        balance = await transact(db, username, req.params.itemID, itemPrice.price, balance.balance);
-        res.type('text').send('' + balance);
-      }
+      await db.run(UPDATE_QUANTITY, [currQuantity.quantity - quantity, itemID]);
+      balance = await transact(db, username, itemID, itemPrice.price, balance.balance, quantity);
+      res.type('text').send('' + balance);
     }
   } catch (error) {
     res.type('text').status(SERVER_ERROR_NUM)
@@ -238,17 +238,48 @@ app.post('/feedback', async (req, res) => {
 });
 
 /**
+ * Handles transaction errors.
+ * @param {object} db the database.
+ * @param {object} currQuantity the current quantity of the item to buy.
+ * @param {number} quantity the quantity requested to buy.
+ * @param {object} balance the buyer's money balance.
+ * @param {object} price the price of the item to buy.
+ * @param {number} itemID the id of the item to buy.
+ * @returns {string} representing the error, if there is one; otherwise, an empty string
+ * representing no error.
+ */
+ function handleTransactErrors(db, currQuantity, quantity, balance, price, itemID, username) {
+  if (!currQuantity) {
+    db.close();
+    return 'Item #' + itemID + ' does not exist.';
+  } else if (currQuantity.quantity < quantity) {
+    db.close();
+    return 'You requested to buy ' + quantity + ' items but only ' + currQuantity.quantity +
+           ' is available.';
+  } else if (!balance) {
+    db.close();
+    return username + ' is not a valid user.';
+  } else if (balance.balance < price.price * quantity) {
+    db.close();
+    return 'You only have Ɖ' + balance.balance + ' but ' + quantity + 'item(s) with ID ' + itemID +
+           ' cost(s) Ɖ' + price.price * quantity + '.';
+  }
+  return '';
+}
+
+/**
  * Completes a transaction by logging the transaction and updates the user's balance.
  * @param {object} db the database object.
  * @param {string} username the username.
  * @param {number} itemID the item ID.
  * @param {number} price the item's price.
  * @param {number} balance the user's balance before the transaction.
+ * @param {number} quantity the quantity of items bought.
  * @returns {number} the balance representing the user's balance after the transaction.
  */
-async function transact(db, username, itemID, price, balance) {
-  await db.run(CREATE_TXN, [username, itemID, price]);
-  await db.run(UPDATE_BALANCE, [balance - price, username]);
+async function transact(db, username, itemID, price, balance, quantity) {
+  await db.run(CREATE_TXN, [username, itemID, quantity * price, quantity]);
+  await db.run(UPDATE_BALANCE, [balance - quantity * price, username]);
   let userBalance = await db.get(GET_BALANCE, [username]);
   db.close();
   return userBalance.balance;

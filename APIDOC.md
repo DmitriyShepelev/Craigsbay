@@ -1,5 +1,5 @@
 # Craigsbay API Documentation
-
+The Craigsbay API allows users to
 
 ##
 **Request Format:**
