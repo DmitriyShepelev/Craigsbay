@@ -33,12 +33,12 @@ const GET_ITEM_FEEDBACK_QUERY = 'SELECT user_name, score, feedback_text ' +
     'FROM Feedbacks WHERE item_id = ?;';
 
 const UPDATE_QUANTITY = 'UPDATE Items SET quantity = (SELECT ' +
-  'quantity FROM Items WHERE item_id = ?) - 1 WHERE item_id = ?;'
+  'quantity FROM Items WHERE item_id = ?) - 1 WHERE item_id = ?;';
 
-const GET_BALANCE = 'SELECT balance FROM Accounts WHERE user_name = ?;'
+const GET_BALANCE = 'SELECT balance FROM Accounts WHERE user_name = ?;';
 
 const CREATE_TXN = 'INSERT INTO Transactions (\'user_name\', \'item_id\', \'total_price\') ' +
-  'VALUES (?, ?, ?);'
+  'VALUES (?, ?, ?);';
 
 const UPDATE_BALANCE = 'UPDATE Accounts SET balance = ? WHERE user_name = ?;';
 
@@ -66,7 +66,8 @@ app.get('/items', async (req, res) => {
     let resultItems = await getItemsFromTable();
     res.json(resultItems);
   } catch (error) {
-    res.type('text').status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
+    res.type('text')
+      .status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
   }
 });
 
@@ -78,7 +79,8 @@ app.get('/search/:query', async (req, res) => {
     let resultItems = await getItemsBySearchQuery(req.params.query);
     res.json(resultItems);
   } catch (error) {
-    res.type('text').status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
+    res.type('text')
+      .status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
   }
 });
 
@@ -98,10 +100,12 @@ app.post('/login', async (req, res) => {
         res.json(false);
       }
     } else {
-      res.type('text').status(REQUEST_ERROR_NUM).send(MISSING_PARAMS);
+      res.type('text')
+        .status(REQUEST_ERROR_NUM).send(MISSING_PARAMS);
     }
   } catch (error) {
-    res.type('text').status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
+    res.type('text')
+      .status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
   }
 });
 
@@ -113,12 +117,14 @@ app.get('/item/:itemID', async (req, res) => {
     let itemID = req.params.itemID;
     let resultItem = await getItemFromTable(itemID);
     if (!resultItem) {
-      res.type('text').status(REQUEST_ERROR_NUM).send('Item #' + itemID + ' does not exist.');
+      res.type('text')
+        .status(REQUEST_ERROR_NUM).send('Item #' + itemID + ' does not exist.');
     } else {
       res.json(resultItem);
     }
   } catch (error) {
-    res.type('text').status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
+    res.type('text')
+      .status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
   }
 });
 
@@ -127,7 +133,8 @@ app.get('/item/:itemID', async (req, res) => {
  */
 app.post('/createaccount', async (req, res) => {
   if (!req.body.username || !req.body.password || !req.body.email) {
-    res.type('text').status(REQUEST_ERROR_NUM).send(MISSING_PARAMS);
+    res.type('text')
+      .status(REQUEST_ERROR_NUM).send(MISSING_PARAMS);
   } else {
     try {
       let db = await getDBConnection();
@@ -135,8 +142,8 @@ app.post('/createaccount', async (req, res) => {
                                   [req.body.username]);
       if (dbResult) {
         db.close();
-        res.type('text').status(REQUEST_ERROR_NUM).send(req.body.username +
-          ' already exists.');
+        res.type('text')
+          .status(REQUEST_ERROR_NUM).send(req.body.username + ' already exists.');
       } else {
         await db.run('INSERT INTO accounts (\'user_name\', \'user_password\', \'email\')' +
                      ' VALUES (?, ?, ?);', [req.body.username, req.body.password, req.body.email]);
@@ -144,7 +151,8 @@ app.post('/createaccount', async (req, res) => {
         res.type('text').send('Success!');
       }
     } catch (error) {
-      res.type('text').status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
+      res.type('text')
+        .status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
     }
   }
 });
@@ -158,14 +166,15 @@ app.post('/buy/:itemID/:username', async (req, res) => {
     let metadata = await db.run(UPDATE_QUANTITY, [req.params.itemID, req.params.itemID]);
     if (metadata.changes === 0) {
       db.close();
-      res.type('text').status(REQUEST_ERROR_NUM).send('Item #' + req.params.itemID
-        + ' does not exist.');
+      res.type('text')
+        .status(REQUEST_ERROR_NUM).send('Item #' + req.params.itemID + ' does not exist.');
     } else {
       let balance = await db.get(GET_BALANCE, [req.params.username]);
       let itemPrice = await db.get(GET_PRICE, [req.params.itemID]);
       if (balance.balance < itemPrice.price) {
         db.close();
-        res.type('text').status(REQUEST_ERROR_NUM).send('You only have Ɖ' + balance.balance +
+        res.type('text')
+          .status(REQUEST_ERROR_NUM).send('You only have Ɖ' + balance.balance +
           ' but item#' + req.params.itemID + ' costs Ɖ' + itemPrice.price + '.');
       } else {
         balance = await transact(db, req.params.username, req.params.itemID, itemPrice.price,
@@ -174,7 +183,8 @@ app.post('/buy/:itemID/:username', async (req, res) => {
       }
     }
   } catch (error) {
-    res.type('text').status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
+    res.type('text')
+      .status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
   }
 });
 
@@ -190,7 +200,8 @@ app.get('/transactions/:username', async (req, res) => {
     db.close();
     res.json(transactions);
   } catch (error) {
-    res.type('text').status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
+    res.type('text')
+      .status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
   }
 });
 
@@ -199,7 +210,8 @@ app.get('/transactions/:username', async (req, res) => {
  */
 app.post('/feedback', async (req, res) => {
   if (!req.body.username || !req.body.score || !req.body.description || !req.body.id) {
-    res.type('text').status(REQUEST_ERROR_NUM).send(MISSING_PARAMS);
+    res.type('text')
+      .status(REQUEST_ERROR_NUM).send(MISSING_PARAMS);
   } else {
     try {
       let db = await getDBConnection();
@@ -208,7 +220,8 @@ app.post('/feedback', async (req, res) => {
       let itemExists = await db.get('SELECT * FROM Items WHERE item_id = ?;', [req.body.id]);
       if (!userExists || !itemExists) {
         db.close();
-        res.type('text').status(REQUEST_ERROR_NUM).send('Your username or item ID does not exist.');
+        res.type('text')
+          .status(REQUEST_ERROR_NUM).send('Your username or item ID does not exist.');
       } else {
         await db.run(CREATE_FEEDBACK, [req.body.id, req.body.username,
           req.body.score, req.body.description]);
@@ -216,7 +229,8 @@ app.post('/feedback', async (req, res) => {
         res.type('text').send('Success!');
       }
     } catch (error) {
-      res.type('text').status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
+      res.type('text')
+        .status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
     }
   }
 });
@@ -233,7 +247,7 @@ app.post('/feedback', async (req, res) => {
 async function transact(db, username, itemID, price, balance) {
   await db.run(CREATE_TXN, [username, itemID, price]);
   await db.run(UPDATE_BALANCE, [balance - price, username]);
-  let userBalance = await db.get(GET_BALANCE,[username]);
+  let userBalance = await db.get(GET_BALANCE, [username]);
   db.close();
   return userBalance.balance;
 }
