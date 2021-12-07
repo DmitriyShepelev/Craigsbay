@@ -172,7 +172,8 @@ app.post('/buy/:itemID/:username', async (req, res) => {
       res.type('text').status(REQUEST_ERROR_NUM)
         .send('Item #' + req.params.itemID + ' does not exist.');
     } else {
-      let balance = await db.get(GET_BALANCE, [req.params.username]);
+      let username = req.params.username;
+      let balance = await db.get(GET_BALANCE, [username]);
       let itemPrice = await db.get(GET_PRICE, [req.params.itemID]);
       if (balance.balance < itemPrice.price) {
         db.close();
@@ -180,8 +181,7 @@ app.post('/buy/:itemID/:username', async (req, res) => {
           .send('You only have Ɖ' + balance.balance + ' but item#' +
           req.params.itemID + ' costs Ɖ' + itemPrice.price + '.');
       } else {
-        balance = await transact(db, req.params.username, req.params.itemID,
-                                 itemPrice.price, balance.balance);
+        balance = await transact(db, username, req.params.itemID, itemPrice.price, balance.balance);
         res.type('text').send('' + balance);
       }
     }
