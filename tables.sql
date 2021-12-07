@@ -29,6 +29,7 @@ CREATE TABLE Transactions (
   user_name TEXT,
   item_id INTEGER,
   total_price REAL,
+  quantity INTEGER,
   transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_name) REFERENCES Accounts(user_name),
   FOREIGN KEY (item_id) REFERENCES Items(item_id)
