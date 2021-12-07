@@ -257,7 +257,7 @@ function handleTransactErrors(currQuantity, quantity, balance, price, itemID, us
   } else if (!balance) {
     return username + ' is not a valid user.';
   } else if (balance.balance < price.price * quantity) {
-    return 'You only have Ɖ' + balance.balance + ' but ' + quantity + 'item(s) with ID ' + itemID +
+    return 'You only have Ɖ' + balance.balance + ' but ' + quantity + ' item(s) with ID ' + itemID +
            ' cost(s) Ɖ' + price.price * quantity + '.';
   }
   return '';
@@ -292,7 +292,7 @@ async function getItemsFromTable() {
   for (let i = 0; i < dbResult.length; i++) {
     dbResult[i]['avg_score'] = await getAverageScore(dbResult[i].item_id);
   }
-  await db.close();
+  db.close();
   return dbResult;
 }
 
@@ -310,7 +310,7 @@ async function getItemsBySearchQuery(searchQuery) {
   for (let i = 0; i < dbResult.length; i++) {
     itemIdArr.push(dbResult[i]['item_id']);
   }
-  await db.close();
+  db.close();
   return itemIdArr;
 }
 
