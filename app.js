@@ -238,17 +238,17 @@ app.post('/feedback', async (req, res) => {
 });
 
 /**
-  * Handles transaction errors.
-  * @param {object} currQuantity the current quantity of the item to buy.
-  * @param {number} quantity the quantity requested to buy.
-  * @param {object} balance the buyer's money balance.
-  * @param {object} price the price of the item to buy.
-  * @param {number} itemID the id of the item to buy.
-  * @param {string} username the buyer's username.
-  * @returns {string} representing the error, if there is one; otherwise, an empty string
-  * representing no error.
-  */
- function handleTransactErrors(currQuantity, quantity, balance, price, itemID, username) {
+ * Handles transaction errors.
+ * @param {object} currQuantity the current quantity of the item to buy.
+ * @param {number} quantity the quantity requested to buy.
+ * @param {object} balance the buyer's money balance.
+ * @param {object} price the price of the item to buy.
+ * @param {number} itemID the id of the item to buy.
+ * @param {string} username the buyer's username.
+ * @returns {string} representing the error, if there is one; otherwise, an empty string
+ * representing no error.
+ */
+function handleTransactErrors(currQuantity, quantity, balance, price, itemID, username) {
   if (!currQuantity) {
     return 'Item #' + itemID + ' does not exist.';
   } else if (currQuantity.quantity < quantity) {
