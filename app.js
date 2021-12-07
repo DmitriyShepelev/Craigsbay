@@ -174,15 +174,15 @@ app.post('/buy/:itemID/:username/:quantity', async (req, res) => {
     let username = req.params.username;
     let currQuantity = await db.get('SELECT quantity FROM Items WHERE item_id = ?;', [itemID]);
     let balance = await db.get(GET_BALANCE, [username]);
-    let itemPrice = await db.get(GET_PRICE, [itemID]);
-    let errResult = handleTransactErrors(db, currQuantity, quantity, balance, itemPrice, itemID,
-                                         username);
+    let price = await db.get(GET_PRICE, [itemID]);
+    let errResult = handleTransactErrors(currQuantity, quantity, balance, price, itemID, username);
     if (errResult !== '') {
+      db.close();
       res.type('text').status(REQUEST_ERROR_NUM)
         .send(errResult);
     } else {
       await db.run(UPDATE_QUANTITY, [currQuantity.quantity - quantity, itemID]);
-      balance = await transact(db, username, itemID, itemPrice.price, balance.balance, quantity);
+      balance = await transact(db, username, itemID, price.price, balance.balance, quantity);
       res.type('text').send('' + balance);
     }
   } catch (error) {
@@ -238,29 +238,25 @@ app.post('/feedback', async (req, res) => {
 });
 
 /**
- * Handles transaction errors.
- * @param {object} db the database.
- * @param {object} currQuantity the current quantity of the item to buy.
- * @param {number} quantity the quantity requested to buy.
- * @param {object} balance the buyer's money balance.
- * @param {object} price the price of the item to buy.
- * @param {number} itemID the id of the item to buy.
- * @returns {string} representing the error, if there is one; otherwise, an empty string
- * representing no error.
- */
- function handleTransactErrors(db, currQuantity, quantity, balance, price, itemID, username) {
+  * Handles transaction errors.
+  * @param {object} currQuantity the current quantity of the item to buy.
+  * @param {number} quantity the quantity requested to buy.
+  * @param {object} balance the buyer's money balance.
+  * @param {object} price the price of the item to buy.
+  * @param {number} itemID the id of the item to buy.
+  * @param {string} username the buyer's username.
+  * @returns {string} representing the error, if there is one; otherwise, an empty string
+  * representing no error.
+  */
+ function handleTransactErrors(currQuantity, quantity, balance, price, itemID, username) {
   if (!currQuantity) {
-    db.close();
     return 'Item #' + itemID + ' does not exist.';
   } else if (currQuantity.quantity < quantity) {
-    db.close();
     return 'You requested to buy ' + quantity + ' items but only ' + currQuantity.quantity +
            ' is available.';
   } else if (!balance) {
-    db.close();
     return username + ' is not a valid user.';
   } else if (balance.balance < price.price * quantity) {
-    db.close();
     return 'You only have Ɖ' + balance.balance + ' but ' + quantity + 'item(s) with ID ' + itemID +
            ' cost(s) Ɖ' + price.price * quantity + '.';
   }
