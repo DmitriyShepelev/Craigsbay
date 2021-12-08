@@ -203,13 +203,13 @@ input[type='radio'] {
   color: black;
 }
 
-#itemContainer {
+#item-container {
   display: flex;
   flex-direction: row;
   padding: 5px;
 }
 
-#itemContainer > img, #itemContainer > div {
+#item-container > img, #item-container > div {
   padding: 30px;
 }
 
