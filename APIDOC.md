@@ -133,16 +133,18 @@ by `transaction_date`.
 ```json
 [
   {
-    "transaction_id": 26,
-    "item_id": 4,
-    "total_price": 500,
-    "transaction_date": "2021-12-07 20:37:46"
+    "item_name": "Superman Action Figure",
+    "transaction_id": 30,
+    "item_id": 3,
+    "total_price": 250,
+    "transaction_date": "2021-12-08 00:59:26"
   },
   {
-    "transaction_id": 25,
-    "item_id": 4,
-    "total_price": 500,
-    "transaction_date": "2021-12-07 20:37:45"
+    "item_name": "Superman Action Figure",
+    "transaction_id": 29,
+    "item_id": 3,
+    "total_price": 250,
+    "transaction_date": "2021-12-08 00:55:08"
   },
 
   .
@@ -150,6 +152,7 @@ by `transaction_date`.
   .
 
   {
+    "item_name": "UW T-shirt",
     "transaction_id": 21,
     "item_id": 4,
     "total_price": 125,
@@ -218,16 +221,23 @@ text message `An error occurred on the server. Try again later.`.
 
 **Request Type:** POST
 
-**Returned Data Format**: Plain text
+**Returned Data Format**: JSON
 
 **Description:** Allows `:username` to buy `:quantity` item(s) with ID
-`:itemID`. Returns the new balance of `:username`.
+`:itemID`. Returns `confirmation_code` representing the transaction's
+confirmation code/id and `balance` representing the user's balance after the
+purchase.
 
 **Example Request:** `/buy/4/David/2`
 
 **Example Response:**
 
-`750`
+```json
+{
+  "confirmation_code": 29,
+  "balance": 465
+}
+```
 
 **Error Handling:**
 * `400` error:

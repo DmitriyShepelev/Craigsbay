@@ -31,6 +31,11 @@ const FULL_SCORE = 5;
 
 const MISSING_PARAMS = 'At least one POST parameter is missing.';
 
+const GET_TRANSACTIONS = 'SELECT item_name, transaction_id, Items.item_id, ' +
+' total_price, transaction_date FROM Transactions, Items WHERE user_name = ?' +
+' AND Items.item_id = Transactions.item_id ORDER BY ' +
+'DATETIME(transaction_date) DESC;';
+
 const AVG_SCORE_QUERY = 'SELECT AVG(score) AS avg_score FROM Feedbacks WHERE item_id = ?;';
 
 const GET_ITEM_FEEDBACK_QUERY = 'SELECT user_name, score, feedback_text ' +
@@ -182,8 +187,7 @@ app.post('/buy/:itemID/:username/:quantity', async (req, res) => {
         .send(errResult);
     } else {
       await db.run(UPDATE_QUANTITY, [currQuantity.quantity - quantity, itemID]);
-      balance = await transact(db, username, itemID, price.price, balance.balance, quantity);
-      res.type('text').send('' + balance);
+      res.json(await transact(db, username, itemID, price.price, balance.balance, quantity));
     }
   } catch (error) {
     res.type('text').status(SERVER_ERROR_NUM)
@@ -197,9 +201,7 @@ app.post('/buy/:itemID/:username/:quantity', async (req, res) => {
 app.get('/transactions/:username', async (req, res) => {
   try {
     let db = await getDBConnection();
-    let transactions = await db.all('SELECT transaction_id, item_id, ' +
-      ' total_price, transaction_date FROM Transactions WHERE user_name = ?' +
-      ' ORDER BY DATETIME(transaction_date) DESC;', [req.params.username]);
+    let transactions = await db.all(GET_TRANSACTIONS, [req.params.username]);
     db.close();
     res.json(transactions);
   } catch (error) {
@@ -271,14 +273,15 @@ function handleTransactErrors(currQuantity, quantity, balance, price, itemID, us
  * @param {number} price the item's price.
  * @param {number} balance the user's balance before the transaction.
  * @param {number} quantity the quantity of items bought.
- * @returns {number} the balance representing the user's balance after the transaction.
+ * @returns {object} the JSON object containing the user's balance after the
+ * transaction and the transaction ID.
  */
 async function transact(db, username, itemID, price, balance, quantity) {
-  await db.run(CREATE_TXN, [username, itemID, quantity * price, quantity]);
+  let transactionID = await db.run(CREATE_TXN, [username, itemID, quantity * price, quantity]);
   await db.run(UPDATE_BALANCE, [balance - quantity * price, username]);
   let userBalance = await db.get(GET_BALANCE, [username]);
   db.close();
-  return userBalance.balance;
+  return {'confirmation_number': transactionID.lastID, 'balance': userBalance.balance};
 }
 
 /**
@@ -297,15 +300,16 @@ async function getItemsFromTable() {
 }
 
 /**
- * Get the item ids of the items where the name of the item matches the "searchQuery"
- * @param {string} searchQuery the search query we are getting the item id
- * @returns {object} the JSON object representing all of the ids that we get from
- *                       the table that matches the searchQuery
+ * Get the item IDs of the items matching a search query.
+ * @param {string} searchQuery the search query.
+ * @returns {object} the JSON object representing the IDs of the items matching
+ * the search query.
  */
 async function getItemsBySearchQuery(searchQuery) {
   let db = await getDBConnection();
-  let dbQuery = 'SELECT item_id FROM Items WHERE item_name LIKE \'%' + searchQuery + '%\'';
-  let dbResult = await db.all(dbQuery);
+  let likeClause = '%' + searchQuery +'%';
+  let dbResult = await db.all('SELECT item_id FROM Items WHERE item_name LIKE ?' +
+   ' OR description LIKE ? OR category LIKE ?;', [likeClause, likeClause, likeClause]);
   let itemIdArr = [];
   for (let i = 0; i < dbResult.length; i++) {
     itemIdArr.push(dbResult[i]['item_id']);
