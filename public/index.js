@@ -45,7 +45,7 @@
     document.getElementById('grid').addEventListener('click', gridView);
     document.getElementById('search-btn').addEventListener('click', search);
     document.getElementById('sign-up-btn').addEventListener('click', signUp);
-    document.querySelector('#sign-up button').addEventListener('click', (event) => {
+    document.querySelector('#sign-up form').addEventListener('submit', (event) => {
       event.preventDefault();
       createAccount();
     });
