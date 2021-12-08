@@ -17,6 +17,8 @@
 
   const LOGIN_ACCOUNT = '/login';
 
+  const BUY_ITEM = '/buy';
+
   const STAR_WIDTH = 75;
 
   const MAX_RATING = 5.0;
@@ -119,6 +121,7 @@
    */
   function signUp() {
     id('sign-up').classList.remove('hidden');
+    id('login').classList.remove('hidden');
     id('home').classList.add('hidden');
     id('transactions').classList.add('hidden');
   }
@@ -335,62 +338,48 @@
       .then(statusCheck)
       .then(res => res.json())
       .then(displaySpecificItemDetails)
+      .catch((err) => handleError(err))
       .catch(() => {
         handleError('Oops. There was an error retrieving the specific details of an item.');
       });
   }
 
+  /**
+   * 
+   * @param {*} json 
+   */
   function displaySpecificItemDetails(json) {
     id('items').classList.add('hidden');
-    let item = gen('article');
-    let itemTitle = gen('h2');
-    itemTitle.textContent = json.item_name;
-    item.appendChild(itemTitle);
-    let itemContainer = gen('div');
-    itemContainer.id = 'itemContainer';
-    let itemPicture = createImage(json);
-    itemContainer.appendChild(itemPicture);
-    let descContainer = gen('div');
-    let price = gen('p');
-    price.classList.add('price');
-    price.textContent = 'Price: Ɖ' + json.price;
-    descContainer.appendChild(price);
-    descContainer.appendChild(createStarRating(json.avg_score));
-    let form = gen('form');
-    let textInput = gen('input');
-    textInput.type = 'text';
-    textInput.min = '1';
-    textInput.max = json.quantity;
-    textInput.id = 'quantity';
-    form.appendChild(textInput);
-    let label = gen('label');
-    label.for = textInput.id;
-    label.textContent = json.quantity > 10 ? ' More than 10 available' : json.quantity +
-    ' available';
-    form.appendChild(label);
-    descContainer.appendChild(form);
-    let category = gen('p');
-    category.textContent = 'Category: ' + json.category;
-    category.classList.add('category');
-    descContainer.appendChild(category);
-    let buyBtn = gen('button');
-    buyBtn.classList.add('green');
-    buyBtn.textContent = 'Buy';
-    descContainer.appendChild(buyBtn);
-    let description = gen('p');
-    description.id = 'description';
-    description.textContent = 'Description:';
-    descContainer.appendChild(description);
-    let descriptionContent = gen('p');
-    descriptionContent.textContent = json.description;
-    descContainer.appendChild(descriptionContent);
-    itemContainer.appendChild(descContainer);
-    item.appendChild(itemContainer);
-    let feedbacks = gen('section');
-    feedbacks.id = 'feedbacks';
+    qs('#item > article > h2').textContent = json.item_name;
+    qs('#item-container > img').src = 'img/' + json.item_id + '.png';
+    qs('#item-container > img').alt = json.item_name;
+    qs('#item-container .price').textContent = 'Price: Ɖ' + json.price;
+    qs('#item-container .category').textContent = 'Category: ' + json.category;
+
+    let prevStar = qs('#item-container .star-container');
+    prevStar.parentElement.replaceChild(createStarRating(json.avg_score), prevStar);
+
+    if (json.quantity > 10) {
+      qs('#item-container form label').textContent = ' More than 10 available';
+    } else {
+      qs('#item-container form label').textContent = json.quantity + ' available';
+    }
+
+    id('description').nextElementSibling.textContent = json.description;
+    addAllFeedback(json);
+    id('item').classList.remove('hidden');
+  }
+
+  /**
+   * Add all feedbacks from json to an item page
+   * @param {*} json 
+   */
+  function addAllFeedback(json) {
+    id('feedbacks').innerHTML = '';
     let reviews = gen('h2');
     reviews.textContent = 'Reviews:';
-    feedbacks.append(reviews);
+    id('feedbacks').append(reviews);
+
     for (let i = 0; i < json.feedbacks.length; i++) {
       let feedback = gen('article');
       feedback.appendChild(createStarRating(json.feedbacks[i].score));
@@ -399,11 +388,8 @@
         feedbackContent.textContent = json.feedbacks[i].feedback_text;
         feedback.appendChild(feedbackContent);
       }
-      feedbacks.appendChild(feedback);
+      id('feedbacks').appendChild(feedback);
     }
-    item.appendChild(feedbacks);
-    id('item').appendChild(item);
-    id('item').classList.remove('hidden');
   }
 
   /**
@@ -433,7 +419,6 @@
     id('home').classList.remove('hidden');
     id('transactions').classList.add('hidden');
     id('items').classList.remove('hidden');
-    id('item').innerHTML = '';
     id('item').classList.add('hidden');
     id('sign-up').classList.add('hidden');
     id('login').classList.add('hidden');

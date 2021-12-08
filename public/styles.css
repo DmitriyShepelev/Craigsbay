@@ -135,7 +135,7 @@ input[type='radio'] {
   border-radius: 0%;
 }
 
-#itemContainer > img {
+#item-container > img {
   height: 400px;
   width: 400px;
 }
