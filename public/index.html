@@ -159,14 +159,36 @@
           </label>
           <br>
           <label>
-            Email <div class='input-cntr'><br><input id='email' type='email' name='sign-up'></div>
+            Email
+            <div class='input-cntr'>
+              <br>
+              <input id='email' type='email' name='sign-up'>
+            </div>
           </label>
           <br>
           <button class='green'>Submit</button>
         </form>
       </section>
       <section id='login' class='hidden'>
+        <form>
+          <label>
+            Username 
+            <div class='input-cntr'>
+              <br>
+              <input id='lg-username' type='text' name='lg-name' required minlength="1">
+            </div>
+          </label>
 
+          <label>
+            Password
+            <div class='input-cntr'>
+              <br>
+              <input id='lg-password' type='password' name='lg-password' required minlength="6">
+            </div>
+          </label>
+          <br>
+          <button class='green'>Submit</button>
+        </form>
       </section>
     </main>
   </body>

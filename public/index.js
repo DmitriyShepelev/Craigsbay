@@ -11,9 +11,11 @@
 
   const ITEM = '/item/';
 
-  const SEARCH = '/search/'
+  const SEARCH = '/search/';
 
-  const CREATE_ACCOUNT = '/createaccount'
+  const CREATE_ACCOUNT = '/createaccount';
+
+  const LOGIN_ACCOUNT = '/login';
 
   const STAR_WIDTH = 75;
 
@@ -45,9 +47,14 @@
     id('grid').addEventListener('click', gridView);
     id('search-btn').addEventListener('click', search);
     id('sign-up-btn').addEventListener('click', signUp);
+    id('login-btn').addEventListener('click', loginView);
     qs('#sign-up form').addEventListener('submit', (event) => {
       event.preventDefault();
       createAccount();
+    });
+    qs('#login form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      login();
     });
   }
 
@@ -68,11 +75,38 @@
   /**
    * 
    */
+  function login() {
+    let data = new FormData();
+    data.append('user', id('lg-username').value);
+    data.append('password', id('lg-password').value);
+    fetch(LOGIN_ACCOUNT, {method: 'POST', body: data})
+      .then(statusCheck)
+      .then(res => res.json())
+      .then(processLoginResponse)
+      .catch((error) => handleError(error.message));
+  }
+
+  /**
+   * 
+   * @param {*} loginResponse 
+   */
+  function processLoginResponse(loginResponse) {
+    if (loginResponse) {
+      displayLoggedIn(id('lg-username').value);
+    } else {
+      throw new Error("Please login again. You have a wrong username or wrong password.");
+    }
+  }
+
+  /**
+   * 
+   */
   function displayLoggedIn(username) {
     id('dropdown').classList.add('hidden');
     id('user').textContent = 'Logged in as ' + username;
     id('user').classList.remove('hidden');
     id('sign-up').classList.add('hidden');
+    id('login').classList.add('hidden');
     id('home').classList.remove('hidden');
     id('sign-up-btn').classList.add('hidden');
     id('login-btn').classList.add('hidden');
@@ -85,6 +119,16 @@
    */
   function signUp() {
     id('sign-up').classList.remove('hidden');
+    id('home').classList.add('hidden');
+    id('transactions').classList.add('hidden');
+  }
+
+  /**
+   * 
+   */
+  function loginView() {
+    id('login').classList.remove('hidden');
+    id('sign-up').classList.add('hidden');
     id('home').classList.add('hidden');
     id('transactions').classList.add('hidden');
   }
@@ -392,6 +436,7 @@
     id('item').innerHTML = '';
     id('item').classList.add('hidden');
     id('sign-up').classList.add('hidden');
+    id('login').classList.add('hidden');
   }
 
   /**
