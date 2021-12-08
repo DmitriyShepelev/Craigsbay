@@ -13,7 +13,7 @@
     <link rel='stylesheet' href='styles.css'>
     <script src='index.js'></script>
   </head>
-    <body>
+  <body>
     <header>
       <p id='error' class='hidden'></p>
       <div id='top-cntr' class='flex'>
@@ -48,82 +48,116 @@
               <article id='price'>
                 <p>Price</p>
                 <label>
-                <input type='checkbox' name='price' value='0–200'>0–200
+                  <input type='checkbox' name='price' value='0–200'>0–200
                 </label>
                 <br>
                 <label>
-                <input type='checkbox' name='price' value='201–400'>201–400
+                  <input type='checkbox' name='price' value='201–400'>201–400
                 </label>
                 <br>
                 <label>
-                <input type='checkbox' name='price' value='401–600'>401–600
+                  <input type='checkbox' name='price' value='401–600'>401–600
                 </label>
                 <br>
                 <label>
-                <input type='checkbox' name='price' value='601–5000'>601–5000
+                  <input type='checkbox' name='price' value='601–5000'>601–5000
                 </label>
               </article>
               <article id='category'>
                 <p>Category</p>
                 <label>
-                <input type='checkbox' name='category' value='electronics'>
-                Electronics
+                  <input type='checkbox' name='category' value='electronics'>
+                  Electronics
                 </label>
                 <br>
-                <label><input type='checkbox' name='category' value='clothing'>
-                Clothing</label>
-                <br>
-                <label><input type='checkbox' name='category' value='collectibles'>
-                Collectibles</label>
+                <label>
+                  <input type='checkbox' name='category' value='clothing'>
+                  Clothing
+                </label>
                 <br>
                 <label>
-                <input type='checkbox' name='category' value='furniture'>
-                Furniture</label>
+                  <input type='checkbox' name='category' value='collectibles'>
+                  Collectibles
+                </label>
                 <br>
                 <label>
-                <input type='checkbox' name='category' value='food'>
-                Food</label>
+                  <input type='checkbox' name='category' value='furniture'>
+                  Furniture
+                </label>
+                <br>
+                <label>
+                  <input type='checkbox' name='category' value='food'>
+                  Food
+                </label>
               </article>
               <article id='rating'>
                 <p>Rating</p>
                 <label>
-                <input type='radio' name='rating' value='0+ stars'>
-                0+ stars</label>
+                  <input type='radio' name='rating' value='0+ stars'>
+                  0+ stars
+                </label>
                 <br>
                 <label>
-                <input type='radio' name='rating' value='1+ stars'>
-                1+ stars</label>
+                  <input type='radio' name='rating' value='1+ stars'>
+                  1+ stars
+                </label>
                 <br>
                 <label>
-                <input type='radio' name='rating' value='2+ stars'>
-                2+ stars</label>
+                  <input type='radio' name='rating' value='2+ stars'>
+                  2+ stars
+                </label>
                 <br>
                 <label>
-                <input type='radio' name='rating' value='3+ stars'>
-                3+ stars</label>
+                  <input type='radio' name='rating' value='3+ stars'>
+                  3+ stars
+                </label>
                 <br>
                 <label>
-                <input type='radio' name='rating' value='4+ stars'>
-                4+ stars</label>
+                  <input type='radio' name='rating' value='4+ stars'>
+                  4+ stars
+                </label>
                 <br>
                 <label>
-                <input type='radio' name='rating' value='5 stars'>
-                5 stars</label>
+                  <input type='radio' name='rating' value='5 stars'>
+                  5 stars
+                </label>
               </article>
               <button class='green'>Submit</button>
-          </form>
+            </form>
           </div>
           <article id='items' class='flex'>
 
           </article>
           <article id='item' class='hidden flex'>
-
+            <article>
+              <h2></h2>
+              <div id="item-container">
+                <img src="img/stars.png" alt="img/stars.png">
+                <div>
+                  <p class="price"></p>
+                  <p class="category"></p>
+                  <div class="star-container" title="5">
+                    <img class="star" src="img/stars.png" alt="stars">
+                  </div>
+                  <form>
+                    <input type="text" min="1" max="34" id="quantity">
+                    <label></label>
+                    <button class="green">Buy</button>
+                  </form>
+                  <p id="description">Description:</p>
+                  <p></p>
+                </div>
+              </div>
+              <section id="feedbacks">
+                <h2>Reviews:</h2>
+              </section>
+            </article>
           </article>
-      </article>
+        </article>
       </section>
       <section id='transactions' class='hidden'>
-      <h2>Dogecoin:</h2>
-      <h2>Transactions:</h2>
+        <h2>Dogecoin:</h2>
+        <h2>Transactions:</h2>
       </section>
       <section id='sign-up' class='hidden'>
         <h2>SIGN UP</h2>
@@ -131,22 +165,53 @@
         <p>Passwords <strong>must</strong> contain <em>at least</em> six characters.</p>
         <form>
           <label>
-            Username <div class='input-cntr'><br><input id='username' type='text' name='sign-up' required></div>
+            Username 
+            <div class='input-cntr'>
+              <br>
+              <input id='username' type='text' name='sign-up' required minlength="1">
+            </div>
           </label>
 
           <label>
-            Password <div class='input-cntr'><br><input id='password' type='password' name='sign-up' required></div>
+            Password
+            <div class='input-cntr'>
+              <br>
+              <input id='password' type='password' name='sign-up' required minlength="6">
+            </div>
           </label>
           <br>
           <label>
-            Email <div class='input-cntr'><br><input id='email' type='email' name='sign-up'></div>
+            Email
+            <div class='input-cntr'>
+              <br>
+              <input id='email' type='email' name='sign-up'>
+            </div>
           </label>
           <br>
           <button class='green'>Submit</button>
         </form>
       </section>
       <section id='login' class='hidden'>
+        <h2>LOGIN</h2>
+        <form>
+          <label>
+            Username 
+            <div class='input-cntr'>
+              <br>
+              <input id='lg-username' type='text' name='lg-name' required minlength="1">
+            </div>
+          </label>
 
+          <label>
+            Password
+            <div class='input-cntr'>
+              <br>
+              <input id='lg-password' type='password' name='lg-password' required minlength="6">
+            </div>
+          </label>
+          <br>
+          <button class='green'>Submit</button>
+        </form>
       </section>
     </main>
   </body>

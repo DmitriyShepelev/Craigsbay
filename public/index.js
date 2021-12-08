@@ -11,9 +11,13 @@
 
   const ITEM = '/item/';
 
-  const SEARCH = '/search/'
+  const SEARCH = '/search/';
 
-  const CREATE_ACCOUNT = '/createaccount'
+  const CREATE_ACCOUNT = '/createaccount';
+
+  const LOGIN_ACCOUNT = '/login';
+
+  const BUY_ITEM = '/buy';
 
   const STAR_WIDTH = 75;
 
@@ -35,67 +39,126 @@
    */
   function init() {
     requestItems();
-    document.getElementById('accounts-btn').addEventListener('click', accountView);
-    document.getElementById('home-btn').addEventListener('click', homeView);
-    document.querySelector('div#filters > form > button').addEventListener('click', (event) => {
+    id('accounts-btn').addEventListener('click', accountView);
+    id('home-btn').addEventListener('click', homeView);
+    qs('div#filters > form > button').addEventListener('click', (event) => {
       event.preventDefault();
       updateDisplayedItems();
     });
-    document.getElementById('list').addEventListener('click', listView);
-    document.getElementById('grid').addEventListener('click', gridView);
-    document.getElementById('search-btn').addEventListener('click', search);
-    document.getElementById('sign-up-btn').addEventListener('click', signUp);
-    document.querySelector('#sign-up button').addEventListener('click', (event) => {
+    id('list').addEventListener('click', listView);
+    id('grid').addEventListener('click', gridView);
+    id('search-btn').addEventListener('click', search);
+    id('sign-up-btn').addEventListener('click', signUp);
+    id('login-btn').addEventListener('click', loginView);
+    qs('#sign-up form').addEventListener('submit', (event) => {
       event.preventDefault();
       createAccount();
     });
+    qs('#login form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      login();
+    });
   }
 
+  /**
+   * 
+   */
   function createAccount() {
     let data = new FormData();
-    data.append('username', document.getElementById('username').value);
-    data.append('password', document.getElementById('password').value);
-    data.append('email', document.getElementById('email').value);
+    data.append('username', id('username').value);
+    data.append('password', id('password').value);
+    data.append('email', id('email').value);
     fetch(CREATE_ACCOUNT, {method: 'POST', body: data})
       .then(statusCheck)
-      .then(() => displayLoggedIn(document.getElementById('username').value))
+      .then(() => displayLoggedIn(id('username').value))
       .catch((error) => handleError(error.message));
   }
 
+  /**
+   * 
+   */
+  function login() {
+    let data = new FormData();
+    data.append('user', id('lg-username').value);
+    data.append('password', id('lg-password').value);
+    fetch(LOGIN_ACCOUNT, {method: 'POST', body: data})
+      .then(statusCheck)
+      .then(res => res.json())
+      .then(processLoginResponse)
+      .catch((error) => handleError(error.message));
+  }
+
+  /**
+   * 
+   * @param {*} loginResponse 
+   */
+  function processLoginResponse(loginResponse) {
+    if (loginResponse) {
+      displayLoggedIn(id('lg-username').value);
+    } else {
+      throw new Error("Please login again. You have a wrong username or wrong password.");
+    }
+  }
+
+  /**
+   * 
+   */
   function displayLoggedIn(username) {
-    document.getElementById('dropdown').classList.add('hidden');
-    document.getElementById('user').textContent = 'Logged in as ' + username;
-    document.getElementById('user').classList.remove('hidden');
-    document.getElementById('sign-up').classList.add('hidden');
-    document.getElementById('home').classList.remove('hidden');
-    document.getElementById('sign-up-btn').classList.add('hidden');
-    document.getElementById('login-btn').classList.add('hidden');
-    document.getElementById('dropdown-cntr').classList.add('norm');
-    document.getElementById('accounts-btn').classList.add('norm');
+    id('dropdown').classList.add('hidden');
+    id('user').textContent = 'Logged in as ' + username;
+    id('user').classList.remove('hidden');
+    id('sign-up').classList.add('hidden');
+    id('login').classList.add('hidden');
+    id('home').classList.remove('hidden');
+    id('sign-up-btn').classList.add('hidden');
+    id('login-btn').classList.add('hidden');
+    id('dropdown-cntr').classList.add('norm');
+    id('accounts-btn').classList.add('norm');
   }
 
+  /**
+   * 
+   */
   function signUp() {
-    document.getElementById('sign-up').classList.remove('hidden');
-    document.getElementById('home').classList.add('hidden');
-    document.getElementById('transactions').classList.add('hidden');
+    id('sign-up').classList.remove('hidden');
+    id('login').classList.remove('hidden');
+    id('home').classList.add('hidden');
+    id('transactions').classList.add('hidden');
   }
 
+  /**
+   * 
+   */
+  function loginView() {
+    id('login').classList.remove('hidden');
+    id('sign-up').classList.add('hidden');
+    id('home').classList.add('hidden');
+    id('transactions').classList.add('hidden');
+  }
+
+  /**
+   * 
+   */
   function search() {
-    if (document.getElementById('search-term').value.trim() !== '') {
-      fetch(SEARCH + document.getElementById('search-term').value)
+    if (id('search-term').value.trim() !== '') {
+      fetch(SEARCH + id('search-term').value)
         .then(statusCheck)
         .then(res => res.json())
         .then(displaySearchResults)
         .catch(() => {
           handleError('Ooops. There was an error searching for ' +
-                      document.getElementById('search-term').value + '.');
+                      id('search-term').value + '.');
         })
     }
   }
 
+  /**
+   * 
+   * @param {*} json 
+   */
   function displaySearchResults(json) {
     console.log(json);
-    let items = document.querySelectorAll('#items > article');
+    let items = qsa('#items > article');
     for (let i = 0; i < items.length; i++) {
       items[i].classList.remove('hidden');
     }
@@ -106,40 +169,49 @@
     }
   }
 
+  /**
+   * 
+   */
   function listView() {
-    document.getElementById('grid').classList.remove('selected');
-    document.getElementById('list').classList.add('selected');
-    document.getElementById('items').classList.remove('flex');
-    document.getElementById('items').classList.add('list');
-    let items = document.querySelectorAll('#items > article');
+    id('grid').classList.remove('selected');
+    id('list').classList.add('selected');
+    id('items').classList.remove('flex');
+    id('items').classList.add('list');
+    let items = qsa('#items > article');
     for (let i = 0; i < items.length; i++) {
       items[i].classList.remove('list');
       items[i].classList.add('flex');
     }
   }
 
+  /**
+   * 
+   */
   function gridView() {
-    document.getElementById('items').classList.add('flex');
-    document.getElementById('items').classList.remove('list');
-    document.getElementById('grid').classList.add('selected');
-    document.getElementById('list').classList.remove('selected');
-    let items = document.querySelectorAll('#items > article');
+    id('items').classList.add('flex');
+    id('items').classList.remove('list');
+    id('grid').classList.add('selected');
+    id('list').classList.remove('selected');
+    let items = qsa('#items > article');
     for (let i = 0; i < items.length; i++) {
       items[i].classList.add('list');
       items[i].classList.remove('flex');
     }
   }
 
+  /**
+   * 
+   */
   function updateDisplayedItems() {
     let notSelectedPrices = [];
-    let prices = document.querySelectorAll('article#price input:not(:checked)');
+    let prices = qsa('article#price input:not(:checked)');
     if (prices.length < NUM_PRICE_RANGES) {
       for (let i = 0; i < prices.length; i++) {
         let range = prices[i].value.split('–');
         notSelectedPrices.push([parseInt(range[0]), parseInt(range[1])]);
       }
     }
-    let categories = document.querySelectorAll('article#category input:not(:checked)');
+    let categories = qsa('article#category input:not(:checked)');
     let notSelectedCategories = [];
     if (categories.length < NUM_CATEGORIES) {
       for (let i = 0; i < categories.length; i++) {
@@ -147,9 +219,9 @@
                                    categories[i].value.substring(1));
       }
     }
-    let checkedRating = document.querySelector('article#rating input:checked');
+    let checkedRating = qs('article#rating input:checked');
     let rating = checkedRating === null ? 0 : checkedRating.value.charAt(0);
-    let items = document.querySelectorAll('#items > article');
+    let items = qsa('#items > article');
     for (let i = 0; i < items.length; i++) {
       items[i].classList.remove('hidden');
     }
@@ -184,34 +256,43 @@
       });
   }
 
+  /**
+   * 
+   * @param {*} json 
+   */
   function displayItems(json) {
     for (let i = 0; i < json.length; i++) {
-      document.getElementById('items').appendChild(constructItem(json[i]));
+      id('items').appendChild(constructItem(json[i]));
     }
   }
 
+  /**
+   * 
+   * @param {*} json 
+   * @returns 
+   */
   function constructItem(json) {
-    let item = document.createElement('article');
+    let item = gen('article');
     item.classList.add('list');
     item.id = json.item_id;
     let itemPicture = createImage(json);
     itemPicture.addEventListener('click', requestSpecificItemDetails);
     item.appendChild(itemPicture);
-    let viewDescContainer = document.createElement('div');
+    let viewDescContainer = gen('div');
     viewDescContainer.id = 'viewDescContainer';
-    let itemName = document.createElement('p');
+    let itemName = gen('p');
     itemName.textContent = json.item_name;
     viewDescContainer.appendChild(itemName);
-    let price = document.createElement('p');
+    let price = gen('p');
     price.classList.add('price');
     price.textContent = 'Ɖ' + json.price;
     viewDescContainer.appendChild(price);
-    let category = document.createElement('p');
+    let category = gen('p');
     category.classList.add('category');
     category.textContent = json.category;
     viewDescContainer.appendChild(category);
     viewDescContainer.appendChild(createStarRating(json.avg_score));
-    let quantity = document.createElement('p');
+    let quantity = gen('p');
     quantity.textContent = json.quantity > 10 ? 'More than 10 available' : json.quantity +
                            ' available';
     viewDescContainer.appendChild(quantity);
@@ -219,10 +300,15 @@
     return item
   }
 
+  /**
+   * 
+   * @param {*} score 
+   * @returns 
+   */
   function createStarRating(score) {
-    let starDiv = document.createElement('div');
+    let starDiv = gen('div');
     starDiv.classList.add('star-container');
-    let stars = document.createElement('img');
+    let stars = gen('img');
     stars.classList.add('star');
     stars.src = STARS;
     stars.alt = 'stars';
@@ -232,8 +318,13 @@
     return starDiv;
   }
 
+  /**
+   * 
+   * @param {*} json 
+   * @returns 
+   */
   function createImage(json) {
-    let itemPicture = document.createElement('img');
+    let itemPicture = gen('img');
     itemPicture.src = 'img/' + json.item_id + '.png';
     itemPicture.alt = json.item_name;
     return itemPicture;
@@ -247,82 +338,69 @@
       .then(statusCheck)
       .then(res => res.json())
       .then(displaySpecificItemDetails)
+      .catch((err) => handleError(err))
       .catch(() => {
         handleError('Oops. There was an error retrieving the specific details of an item.');
       });
   }
 
+  /**
+   * 
+   * @param {*} json 
+   */
   function displaySpecificItemDetails(json) {
-    document.getElementById('items').classList.add('hidden');
-    let item = document.createElement('article');
-    let itemTitle = document.createElement('h2');
-    itemTitle.textContent = json.item_name;
-    item.appendChild(itemTitle);
-    let itemContainer = document.createElement('div');
-    itemContainer.id = 'itemContainer';
-    let itemPicture = createImage(json);
-    itemContainer.appendChild(itemPicture);
-    let descContainer = document.createElement('div');
-    let price = document.createElement('p');
-    price.classList.add('price');
-    price.textContent = 'Price: Ɖ' + json.price;
-    descContainer.appendChild(price);
-    descContainer.appendChild(createStarRating(json.avg_score));
-    let form = document.createElement('form');
-    let textInput = document.createElement('input');
-    textInput.type = 'text';
-    textInput.min = '1';
-    textInput.max = json.quantity;
-    textInput.id = 'quantity';
-    form.appendChild(textInput);
-    let label = document.createElement('label');
-    label.for = textInput.id;
-    label.textContent = json.quantity > 10 ? ' More than 10 available' : json.quantity +
-    ' available';
-    form.appendChild(label);
-    descContainer.appendChild(form);
-    let category = document.createElement('p');
-    category.textContent = 'Category: ' + json.category;
-    category.classList.add('category');
-    descContainer.appendChild(category);
-    let buyBtn = document.createElement('button');
-    buyBtn.classList.add('green');
-    buyBtn.textContent = 'Buy';
-    descContainer.appendChild(buyBtn);
-    let description = document.createElement('p');
-    description.id = 'description';
-    description.textContent = 'Description:';
-    descContainer.appendChild(description);
-    let descriptionContent = document.createElement('p');
-    descriptionContent.textContent = json.description;
-    descContainer.appendChild(descriptionContent);
-    itemContainer.appendChild(descContainer);
-    item.appendChild(itemContainer);
-    let feedbacks = document.createElement('section');
-    feedbacks.id = 'feedbacks';
-    let reviews = document.createElement('h2');
+    id('items').classList.add('hidden');
+    qs('#item > article > h2').textContent = json.item_name;
+    qs('#item-container > img').src = 'img/' + json.item_id + '.png';
+    qs('#item-container > img').alt = json.item_name;
+    qs('#item-container .price').textContent = 'Price: Ɖ' + json.price;
+    qs('#item-container .category').textContent = 'Category: ' + json.category;
+
+    let prevStar = qs('#item-container .star-container');
+    prevStar.parentElement.replaceChild(createStarRating(json.avg_score), prevStar);
+
+    if (json.quantity > 10) {
+      qs('#item-container form label').textContent = ' More than 10 available';
+    } else {
+      qs('#item-container form label').textContent = json.quantity + ' available';
+    }
+
+    id('description').nextElementSibling.textContent = json.description;
+    addAllFeedback(json);
+    id('item').classList.remove('hidden');
+  }
+
+  /**
+   * Add all feedbacks from json to an item page
+   * @param {*} json 
+   */
+  function addAllFeedback(json) {
+    id('feedbacks').innerHTML = '';
+    let reviews = gen('h2');
     reviews.textContent = 'Reviews:';
-    feedbacks.append(reviews);
+    id('feedbacks').append(reviews);
+
     for (let i = 0; i < json.feedbacks.length; i++) {
-      let feedback = document.createElement('article');
+      let feedback = gen('article');
       feedback.appendChild(createStarRating(json.feedbacks[i].score));
       if (json.feedbacks[i].feedback_text !== undefined) {
-        let feedbackContent = document.createElement('p');
+        let feedbackContent = gen('p');
         feedbackContent.textContent = json.feedbacks[i].feedback_text;
         feedback.appendChild(feedbackContent);
       }
-      feedbacks.appendChild(feedback);
+      id('feedbacks').appendChild(feedback);
     }
-    item.appendChild(feedbacks);
-    document.getElementById('item').appendChild(item);
-    document.getElementById('item').classList.remove('hidden');
   }
 
+  /**
+   * 
+   * @param {*} errorMessage 
+   */
   function handleError(errorMessage) {
-    document.getElementById('error').textContent = errorMessage;
-    document.getElementById('error').classList.remove('hidden');
+    id('error').textContent = errorMessage;
+    id('error').classList.remove('hidden');
     setTimeout(function() {
-      document.getElementById('error').classList.add('hidden');
+      id('error').classList.add('hidden');
     }, TWO_SECS);
   }
 
@@ -330,20 +408,20 @@
    * Switches the view to the Transactions View.
    */
   function accountView() {
-    document.getElementById('home').classList.add('hidden');
-    document.getElementById('transactions').classList.remove('hidden');
+    id('home').classList.add('hidden');
+    id('transactions').classList.remove('hidden');
   }
 
   /**
    * Switches the view to the Home View.
    */
   function homeView() {
-    document.getElementById('home').classList.remove('hidden');
-    document.getElementById('transactions').classList.add('hidden');
-    document.getElementById('items').classList.remove('hidden');
-    document.getElementById('item').innerHTML = '';
-    document.getElementById('item').classList.add('hidden');
-    document.getElementById('sign-up').classList.add('hidden');
+    id('home').classList.remove('hidden');
+    id('transactions').classList.add('hidden');
+    id('items').classList.remove('hidden');
+    id('item').classList.add('hidden');
+    id('sign-up').classList.add('hidden');
+    id('login').classList.add('hidden');
   }
 
   /**
@@ -359,4 +437,46 @@
     }
     return res;
   }
+
+  /**
+   * Shortcut Helper functions (with comments) from:
+   * https://replit.com/@afitzg/cse154-21au-template#script.js
+   */
+
+  /**
+   * Returns the element that has the ID attribute with the specified value.
+   * @param {String} idName - element ID
+   * @returns {Object} DOM object associated with id.
+   */
+   function id(idName) {
+    return document.getElementById(idName);
+  }
+
+  /**
+   * Returns the first element that matches the given CSS selector.
+   * @param {String} selector - CSS query selector.
+   * @returns {Object} The first DOM object matching the query.
+   */
+  function qs(selector) {
+    return document.querySelector(selector);
+  }
+
+  /**
+   * Returns the array of elements that match the given CSS selector.
+   * @param {String} selector - CSS query selector
+   * @returns {Object[]} array of DOM objects matching the query.
+   */
+  function qsa(selector) {
+    return document.querySelectorAll(selector);
+  }
+
+  /**
+   * Returns a new element with the given tag name.
+   * @param {String} tagName - HTML tag name for new DOM element.
+   * @returns {Object} New DOM object for given HTML tag.
+   */
+  function gen(tagName) {
+    return document.createElement(tagName);
+  }
+
 })();

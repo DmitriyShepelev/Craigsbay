@@ -135,7 +135,7 @@ input[type='radio'] {
   border-radius: 0%;
 }
 
-#itemContainer > img {
+#item-container > img {
   height: 400px;
   width: 400px;
 }
@@ -184,17 +184,17 @@ input[type='radio'] {
   margin-left: 40px;
 }
 
-.input-cntr, #sign-up form {
+.input-cntr, #sign-up form, #login form {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-#sign-up p {
+#sign-up p, #login p {
   text-align: center;
 }
 
-#sign-up label {
+#sign-up label, #login label {
   margin-top: 20px;
 }
 
@@ -259,7 +259,7 @@ article.list {
   border-radius: 50px;
 }
 
-#sign-up-btn {
+#sign-up-btn, #login-btn {
   border-radius: 0px;
 }
 
