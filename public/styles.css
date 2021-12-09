@@ -43,6 +43,22 @@ div#filters {
   justify-content: start;
 }
 
+#transaction-confirmation {
+  z-index: 1;
+  position: fixed;
+  background-color: white;
+  align-items: center;
+  width: 300px;
+  margin-left: 40%;
+  margin-right: 50%;
+  border: black 2px solid;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
 #filters {
   min-width: 100px;
   padding-left: 20px;
@@ -155,7 +171,11 @@ input[type='radio'] {
 #quantity {
   margin-top: 10px;
   margin-bottom: 10px;
-  width: 25px;
+  /* width: 50px; */
+}
+
+#item-container button {
+  display: block;
 }
 
 #feedbacks article {

@@ -34,6 +34,19 @@
     </header>
     <main>
       <section id='home'>
+        <article id='transaction-confirmation' class='hidden'>
+          <div id='incomplete-transaction'>
+            <p>Do you <em>really</em> want to buy this item?</p>
+            <div id='confirmation' class='flex'>
+              <button id='yes'>Yes</button>
+              <button id='no'>No</button>
+            </div>
+          </div>
+          <div id='complete-transaction' class='hidden'>
+            <p></p>
+            <button id='close'>Close</button>
+          </div>
+        </article>
         <article id='search-bar'>
           <input id='search-term' type='text' placeholder='Search' required>
           <button id='search-btn' class='green' type='button'>Search</button>
@@ -126,7 +139,6 @@
             </form>
           </div>
           <article id='items' class='flex'>
-
           </article>
           <article id='item' class='hidden flex'>
             <article>
@@ -140,7 +152,7 @@
                     <img class="star" src="img/stars.png" alt="stars">
                   </div>
                   <form>
-                    <input type="number" min="0" max="999" id="quantity">
+                    <input type="number" min="1" max="999" maxlength="3" id="quantity">
                     <label></label>
                     <button class="green">Buy</button>
                   </form>
@@ -149,7 +161,6 @@
                 </div>
               </div>
               <section id="feedbacks">
-                <h2>Reviews:</h2>
               </section>
             </article>
           </article>

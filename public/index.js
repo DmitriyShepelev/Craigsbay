@@ -13,11 +13,13 @@
 
   const SEARCH = '/search/';
 
+  const LOGGED_IN_AS = 'Logged in as ';
+
   const CREATE_ACCOUNT = '/createaccount';
 
   const LOGIN_ACCOUNT = '/login';
 
-  const BUY_ITEM = '/buy';
+  const BUY_ITEM = '/buy/';
 
   const STAR_WIDTH = 75;
 
@@ -58,10 +60,50 @@
       event.preventDefault();
       login();
     });
+    qs('#item-container form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      confirmTransaction();
+    });
+    id('yes').addEventListener('click', buy);
+    id('no').addEventListener('click', closeTransactionWindow);
+    id('close').addEventListener('click', closeTransactionWindow)
+  }
+
+  function closeTransactionWindow() {
+    id('transaction-confirmation').classList.add('hidden');
+    id('incomplete-transaction').classList.remove('hidden');
+    id('complete-transaction').classList.add('hidden');
+  }
+
+  function buy() {
+    let imgSrc = qs('#item-container > img').src;
+    let itemID = imgSrc.substring(imgSrc.indexOf('img/') + 4, imgSrc.lastIndexOf('.'));
+    fetch(BUY_ITEM + itemID + '/' + id('user').textContent.substring(LOGGED_IN_AS.length) + '/' + id('quantity').value, {method: 'POST'})
+      .then(statusCheck)
+      .then(res => res.json())
+      .then((json) => {
+        updateBalance(json, itemID);
+      })
+      .catch(handleError);
+  }
+
+  function updateBalance(json, itemID) {
+    qs('#complete-transaction > p').textContent = 'Confirmation code: ' +
+      json.confirmation_number;
+    id('incomplete-transaction').classList.add('hidden');
+    id('complete-transaction').classList.remove('hidden');
+    requestItems();
+    console.log(itemID);
+    requestSpecificItemDetails(parseInt(itemID));
+  }
+
+  function confirmTransaction() {
+    id('transaction-confirmation').classList.remove('hidden');
+    id('transaction-confirmation').classList.add('flex-col');
   }
 
   /**
-   * 
+   *
    */
   function createAccount() {
     let data = new FormData();
@@ -75,7 +117,7 @@
   }
 
   /**
-   * 
+   *
    */
   function login() {
     let data = new FormData();
@@ -89,8 +131,8 @@
   }
 
   /**
-   * 
-   * @param {*} loginResponse 
+   *
+   * @param {*} loginResponse
    */
   function processLoginResponse(loginResponse) {
     if (loginResponse) {
@@ -101,11 +143,11 @@
   }
 
   /**
-   * 
+   *
    */
   function displayLoggedIn(username) {
     id('dropdown').classList.add('hidden');
-    id('user').textContent = 'Logged in as ' + username;
+    id('user').textContent = LOGGED_IN_AS + username;
     id('user').classList.remove('hidden');
     id('sign-up').classList.add('hidden');
     id('login').classList.add('hidden');
@@ -117,7 +159,7 @@
   }
 
   /**
-   * 
+   *
    */
   function signUp() {
     id('sign-up').classList.remove('hidden');
@@ -127,7 +169,7 @@
   }
 
   /**
-   * 
+   *
    */
   function loginView() {
     id('login').classList.remove('hidden');
@@ -137,7 +179,7 @@
   }
 
   /**
-   * 
+   *
    */
   function search() {
     if (id('search-term').value.trim() !== '') {
@@ -153,8 +195,8 @@
   }
 
   /**
-   * 
-   * @param {*} json 
+   *
+   * @param {*} json
    */
   function displaySearchResults(json) {
     console.log(json);
@@ -170,7 +212,7 @@
   }
 
   /**
-   * 
+   *
    */
   function listView() {
     id('grid').classList.remove('selected');
@@ -185,7 +227,7 @@
   }
 
   /**
-   * 
+   *
    */
   function gridView() {
     id('items').classList.add('flex');
@@ -200,7 +242,7 @@
   }
 
   /**
-   * 
+   *
    */
   function updateDisplayedItems() {
     let notSelectedPrices = [];
@@ -247,6 +289,7 @@
    * Request all the items for sale.
    */
   function requestItems() {
+    id('items').innerHTML = '';
     fetch(ITEMS)
       .then(statusCheck)
       .then(res => res.json())
@@ -257,8 +300,8 @@
   }
 
   /**
-   * 
-   * @param {*} json 
+   *
+   * @param {*} json
    */
   function displayItems(json) {
     for (let i = 0; i < json.length; i++) {
@@ -267,9 +310,9 @@
   }
 
   /**
-   * 
-   * @param {*} json 
-   * @returns 
+   *
+   * @param {*} json
+   * @returns
    */
   function constructItem(json) {
     let item = gen('article');
@@ -301,9 +344,9 @@
   }
 
   /**
-   * 
-   * @param {*} score 
-   * @returns 
+   *
+   * @param {*} score
+   * @returns
    */
   function createStarRating(score) {
     let starDiv = gen('div');
@@ -319,9 +362,9 @@
   }
 
   /**
-   * 
-   * @param {*} json 
-   * @returns 
+   *
+   * @param {*} json
+   * @returns
    */
   function createImage(json) {
     let itemPicture = gen('img');
@@ -333,20 +376,23 @@
   /**
    *
    */
-  function requestSpecificItemDetails() {
-    fetch(ITEM + this.src.substring(this.src.indexOf('img') + 4, this.src.lastIndexOf('.')))
+  function requestSpecificItemDetails(itemID) {
+    let item;
+    if (Number.isInteger(itemID)) {
+      item = itemID;
+    } else {
+      item = this.src.substring(this.src.indexOf('img') + 4, this.src.lastIndexOf('.'));
+    }
+    fetch(ITEM + item)
       .then(statusCheck)
       .then(res => res.json())
       .then(displaySpecificItemDetails)
-      .catch((err) => handleError(err))
-      .catch(() => {
-        handleError('Oops. There was an error retrieving the specific details of an item.');
-      });
+      .catch((err) => handleError(err));
   }
 
   /**
-   * 
-   * @param {*} json 
+   *
+   * @param {*} json
    */
   function displaySpecificItemDetails(json) {
     id('items').classList.add('hidden');
@@ -355,10 +401,9 @@
     qs('#item-container > img').alt = json.item_name;
     qs('#item-container .price').textContent = 'Price: Ɖ' + json.price;
     qs('#item-container .category').textContent = 'Category: ' + json.category;
-
+    qs('#item-container input').max = json.quantity;
     let prevStar = qs('#item-container .star-container');
     prevStar.parentElement.replaceChild(createStarRating(json.avg_score), prevStar);
-
     if (json.quantity > 10) {
       qs('#item-container form label').textContent = ' More than 10 available';
     } else {
@@ -372,14 +417,18 @@
 
   /**
    * Add all feedbacks from json to an item page
-   * @param {*} json 
+   * @param {*} json
    */
   function addAllFeedback(json) {
     id('feedbacks').innerHTML = '';
     let reviews = gen('h2');
     reviews.textContent = 'Reviews:';
     id('feedbacks').append(reviews);
-
+    let addFeedbackBtn = gen('button');
+    addFeedbackBtn.textContent = 'Add a review';
+    addFeedbackBtn.id = 'feedback-btn';
+    addFeedbackBtn.addEventListener('click', openFeedback);
+    id('feedbacks').append(addFeedbackBtn);
     for (let i = 0; i < json.feedbacks.length; i++) {
       let feedback = gen('article');
       feedback.appendChild(createStarRating(json.feedbacks[i].score));
@@ -392,11 +441,26 @@
     }
   }
 
+  function openFeedback() {
+    id('feedback-btn').classList.add('hidden');
+    let feedbackForm = gen('form');
+    feedbackForm.classList.add('flex-col');
+    let textArea = gen('textarea');
+    textArea.required = true;
+    textArea.placeholder = 'Add a review here.';
+    feedbackForm.appendChild(textArea);
+    let submit = gen('button');
+    submit.textContent = 'Submit review';
+    feedbackForm.appendChild(submit);
+    qs('#feedbacks h2').insertAdjacentElement('afterend', feedbackForm);
+  }
+
   /**
-   * 
-   * @param {*} errorMessage 
+   *
+   * @param {*} errorMessage
    */
   function handleError(errorMessage) {
+    console.log(errorMessage);
     id('error').textContent = errorMessage;
     id('error').classList.remove('hidden');
     setTimeout(function() {
