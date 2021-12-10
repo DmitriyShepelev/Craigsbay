@@ -186,7 +186,7 @@
    */
   function signUp() {
     id('sign-up').classList.remove('hidden');
-    id('login').classList.remove('hidden');
+    id('login').classList.add('hidden');
     id('home').classList.add('hidden');
     id('transactions').classList.add('hidden');
   }

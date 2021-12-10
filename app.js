@@ -163,9 +163,9 @@ app.post('/createaccount', async (req, res) => {
       } else {
         await db.run('INSERT INTO Accounts (\'user_name\', \'user_password\', \'email\')' +
                      ' VALUES (?, ?, ?);', [req.body.username, req.body.password, req.body.email]);
-        let balance = await db.get(GET_BALANCE, [req.body.username]);
+        let userBalance = await db.get(GET_BALANCE, [req.body.username]);
         db.close();
-        res.json(balance);
+        res.json(userBalance.balance);
       }
     } catch (error) {
       res.type('text').status(SERVER_ERROR_NUM)
