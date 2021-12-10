@@ -23,6 +23,8 @@
 
   const BUY_ITEM = '/buy/';
 
+  const GET_TRANSACTION = '/transactions/';
+
   const STAR_WIDTH = 75;
 
   const MAX_RATING = 5.0;
@@ -362,7 +364,7 @@
                            ' available';
     viewDescContainer.appendChild(quantity);
     item.appendChild(viewDescContainer);
-    return item
+    return item;
   }
 
   /**
@@ -529,6 +531,41 @@
   function accountView() {
     id('home').classList.add('hidden');
     id('transactions').classList.remove('hidden');
+
+    fetch(GET_TRANSACTION + id('user').textContent.substring(LOGGED_IN_AS.length))
+      .then(statusCheck)
+      .then(res => res.json())
+      .then(displayTransactions)
+      .catch(handleError);
+  }
+
+  function displayTransactions(transactions) {
+    qs('#transactions article').innerHTML = "";
+
+    for (let i = 0; i < transactions.length; i++) {
+      let currTransaction = createIndividualTransaction(transactions[i]);
+      qs('#transactions article').appendChild(currTransaction);
+    }
+  }
+
+  function createIndividualTransaction(transactionObj) {
+    let transactionContainer = gen('article');
+
+    let transactionIdPart = "Transaction id: " + transactionObj.transaction_id;
+    appendParagraph(transactionContainer, transactionIdPart);
+    let dateString = (new Date(transactionObj.transaction_date)).toLocaleString();
+    appendParagraph(transactionContainer, "Date: " + dateString);
+
+    appendParagraph(transactionContainer, "Item name: " + transactionObj.item_name);
+    appendParagraph(transactionContainer, "Total cost: " + transactionObj.total_price);
+    return transactionContainer;
+  }
+
+
+  function appendParagraph(element, pContent) {
+    let paragraph = gen('p');
+    paragraph.textContent = pContent;
+    element.append(paragraph);
   }
 
   /**

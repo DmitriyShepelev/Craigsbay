@@ -24,7 +24,7 @@ header {
 }
 
 hr {
-  border: 3 solid ;
+  border: 3 solid;
 }
 
 nav, #search-bar {
@@ -182,8 +182,13 @@ input[type='radio'] {
   display: block;
 }
 
-#feedbacks article {
-  border-bottom: 1px solid black;
+#feedbacks article, #transactions article article {
+  padding: 20px 0px 20px 0px;
+  border-bottom: 2px solid black;
+}
+
+#feedbacks article p, #transactions article article p {
+  margin: 5px 0px 5px 0px;
 }
 
 #description {
