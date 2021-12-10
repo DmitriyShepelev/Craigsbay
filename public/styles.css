@@ -59,6 +59,10 @@ div#filters {
   flex-direction: column;
 }
 
+#feedbacks > form > input {
+  width: 40px;
+}
+
 #filters {
   min-width: 100px;
   padding-left: 20px;

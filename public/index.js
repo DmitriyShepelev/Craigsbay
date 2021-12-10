@@ -1,7 +1,7 @@
 /*
  * Name: Dmitriy Shepelev and Jim Supawish
  * Date: November 29, 2021
- * Section: CSE 154 AC and TODO: Add Jim's section.
+ * Section: CSE 154 AC
  * TODO: Add comments.
  */
 'use strict';
@@ -12,6 +12,8 @@
   const ITEM = '/item/';
 
   const SEARCH = '/search/';
+
+  const SUBMIT_FEEDBACK = '/feedback';
 
   const LOGGED_IN_AS = 'Logged in as ';
 
@@ -444,15 +446,47 @@
   function openFeedback() {
     id('feedback-btn').classList.add('hidden');
     let feedbackForm = gen('form');
+    feedbackForm.id = 'feedback-form';
     feedbackForm.classList.add('flex-col');
+    let ratingInput = gen('input');
+    ratingInput.type = 'number';
+    ratingInput.min = 0;
+    ratingInput.max = 5;
+    ratingInput.required = true;
+    let ratingLabel = gen('label');
+    ratingLabel.textContent = 'Rating:';
+    feedbackForm.appendChild(ratingLabel);
+    feedbackForm.appendChild(ratingInput);
     let textArea = gen('textarea');
     textArea.required = true;
     textArea.placeholder = 'Add a review here.';
     feedbackForm.appendChild(textArea);
     let submit = gen('button');
     submit.textContent = 'Submit review';
+    feedbackForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      submitFeedback();
+    })
     feedbackForm.appendChild(submit);
     qs('#feedbacks h2').insertAdjacentElement('afterend', feedbackForm);
+  }
+
+  function submitFeedback() {
+    let data = new FormData();
+    let username = id('user').textContent.substring(LOGGED_IN_AS.length);
+    data.append('username', username);
+    let imgSrc = qs('#item-container > img').src;
+    let itemID = imgSrc.substring(imgSrc.indexOf('img/') + 4, imgSrc.lastIndexOf('.'));
+    let score = qs('#feedback-form input').value;
+    data.append('score', score);
+    data.append('id', itemID);
+    console.log(itemID);
+    data.append('description', qs('textarea').value);
+    fetch(SUBMIT_FEEDBACK, {method: 'POST', body: data})
+      .then(statusCheck)
+      .then(res => res.text())
+      .then(() => requestSpecificItemDetails(parseInt(itemID)))
+      .catch(handleError);
   }
 
   /**
