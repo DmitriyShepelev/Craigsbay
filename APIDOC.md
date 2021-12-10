@@ -162,6 +162,8 @@ by `transaction_date`.
 ```
 
 **Error Handling:**
+* `400` error: If the user is not logged in, return an error with the plain text
+message `You are not logged in.`.
 * `500` error: If there is a server-side error, return an error with the plain
 text message `An error occurred on the server. Try again later.`.
 
@@ -173,13 +175,13 @@ text message `An error occurred on the server. Try again later.`.
 **Returned Data Format**: JSON
 
 **Description:** Verifies a user's username and password information, returning
-true iff the verification was successful.
+the user's balance if the verification was successful. Otherwise, returns 0.
 
 **Example Request:** `/login` with `user=jim` and `password=password`.
 
 **Example Response:**
 ```json
-true
+95.05
 ```
 
 **Error Handling:**
@@ -241,6 +243,8 @@ purchase.
 
 **Error Handling:**
 * `400` error:
+  * If the user is not logged in, return an error with the plain text message
+  `You are not logged in.`.
   * If an item with ID `:itemID` does not exist, return an error with the plain
   text message `Item #:itemID does not exist.`
   * If there is only `quantity` items with ID `:itemID` available for purchase
@@ -277,7 +281,10 @@ text message `An error occurred on the server. Try again later.`.
 `Success!`
 
 **Error Handling:**
-* `400` error: If the `username` or item with ID `id` does not exist, return an
+* `400` error:
+  * If the user is not logged in, return an error with the plain text message
+  `You are not logged in.`.
+  * If the `username` or item with ID `id` does not exist, return an
 error with the plain text message `Your username or item ID does not exist.`
 
 * `500` error: If there is a server-side error, return an error with the plain

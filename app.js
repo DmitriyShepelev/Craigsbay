@@ -11,6 +11,8 @@
 
 'use strict';
 
+const cookieParser = require('cookie-parser');
+
 const express = require('express');
 
 const multer = require('multer');
@@ -70,6 +72,8 @@ app.use(express.json()); // Built-in middleware.
 // For multipart/form-data (required with FormData).
 app.use(multer().none()); // Requires the "multer" module.
 
+app.use(cookieParser());
+
 /**
  * Gets every item.
  */
@@ -103,13 +107,14 @@ app.post('/login', async (req, res) => {
   try {
     if (req.body.user && req.body.password) {
       let db = await getDBConnection();
-      let getUserInfoQuery = 'SELECT user_name, user_password FROM Accounts WHERE user_name = ?';
+      let getUserInfoQuery = 'SELECT user_name, user_password, balance FROM ' +
+      'Accounts WHERE user_name = ?';
       let dbResult = await db.get(getUserInfoQuery, [req.body.user]);
       db.close();
-      if (dbResult) {
-        res.json(dbResult['user_password'] === req.body.password);
+      if (dbResult && dbResult['user_password'] === req.body.password) {
+        res.json(dbResult.balance);
       } else {
-        res.json(false);
+        res.json(0);
       }
     } else {
       res.type('text').status(REQUEST_ERROR_NUM)
@@ -180,7 +185,8 @@ app.post('/buy/:itemID/:username/:quantity', async (req, res) => {
     let currQuantity = await db.get('SELECT quantity FROM Items WHERE item_id = ?;', [itemID]);
     let balance = await db.get(GET_BALANCE, [username]);
     let price = await db.get(GET_PRICE, [itemID]);
-    let errResult = handleTransactErrors(currQuantity, quantity, balance, price, itemID, username);
+    let errResult = handleTransactErrors([currQuantity, quantity], balance, price, itemID,
+      username, req.cookies.user);
     if (errResult !== '') {
       db.close();
       res.type('text').status(REQUEST_ERROR_NUM)
@@ -199,14 +205,19 @@ app.post('/buy/:itemID/:username/:quantity', async (req, res) => {
  * Get a user's transactions.
  */
 app.get('/transactions/:username', async (req, res) => {
-  try {
-    let db = await getDBConnection();
-    let transactions = await db.all(GET_TRANSACTIONS, [req.params.username]);
-    db.close();
-    res.json(transactions);
-  } catch (error) {
-    res.type('text').status(SERVER_ERROR_NUM)
-      .send(SERVER_ERROR_MSG);
+  if (!req.cookies.user) {
+    res.type('text').status(REQUEST_ERROR_NUM)
+      .send('You are not logged in.');
+  } else {
+    try {
+      let db = await getDBConnection();
+      let transactions = await db.all(GET_TRANSACTIONS, [req.params.username]);
+      db.close();
+      res.json(transactions);
+    } catch (error) {
+      res.type('text').status(SERVER_ERROR_NUM)
+        .send(SERVER_ERROR_MSG);
+    }
   }
 });
 
@@ -222,10 +233,12 @@ app.post('/feedback', async (req, res) => {
       let db = await getDBConnection();
       let userExists = await db.get(GET_ACCOUNTS, [req.body.username]);
       let itemExists = await db.get(GET_ITEM, [req.body.id]);
-      if (!userExists || !itemExists) {
+      let errResult = feedbackErrorHandling(userExists, req.body.username, itemExists, req.body.id,
+                                            req.cookies.user);
+      if (errResult !== '') {
         db.close();
         res.type('text').status(REQUEST_ERROR_NUM)
-          .send('Your username or item ID does not exist.');
+          .send(errResult);
       } else {
         await db.run(CREATE_FEEDBACK, [req.body.id, req.body.username,
           req.body.score, req.body.description]);
@@ -240,6 +253,26 @@ app.post('/feedback', async (req, res) => {
 });
 
 /**
+ *
+ * @param {*} userExists
+ * @param {*} username
+ * @param {*} itemExists
+ * @param {*} itemID
+ * @param {*} loggedIn
+ * @returns
+ */
+function feedbackErrorHandling(userExists, username, itemExists, itemID, loggedIn) {
+  if (!loggedIn) {
+    return 'You are not logged in.';
+  } else if (!userExists) {
+    return username + ' is not a valid username.';
+  } else if (!itemExists) {
+    return 'There is no valid item with ID ' + itemID + '.';
+  }
+  return '';
+}
+
+/**
  * Handles transaction errors.
  * @param {object} currQuantity the current quantity of the item to buy.
  * @param {number} quantity the quantity requested to buy.
@@ -250,17 +283,19 @@ app.post('/feedback', async (req, res) => {
  * @returns {string} representing the error, if there is one; otherwise, an empty string
  * representing no error.
  */
-function handleTransactErrors(currQuantity, quantity, balance, price, itemID, username) {
-  if (!currQuantity) {
+function handleTransactErrors(quantity, balance, price, itemID, username, loggedIn) {
+  if (!loggedIn) {
+    return 'You are not logged in';
+  } else if (!quantity[0]) {
     return 'Item #' + itemID + ' does not exist.';
-  } else if (currQuantity.quantity < quantity) {
-    return 'You requested to buy ' + quantity + ' items but only ' + currQuantity.quantity +
+  } else if (quantity[0].quantity < quantity[1]) {
+    return 'You requested to buy ' + quantity[1] + ' items but only ' + quantity[0].quantity +
            ' is available.';
   } else if (!balance) {
     return username + ' is not a valid user.';
-  } else if (balance.balance < price.price * quantity) {
-    return 'You only have Ɖ' + balance.balance + ' but ' + quantity + ' item(s) with ID ' + itemID +
-           ' cost(s) Ɖ' + price.price * quantity + '.';
+  } else if (balance.balance < price.price * quantity[1]) {
+    return 'You only have Ɖ' + balance.balance + ' but ' + quantity[1] + ' item(s) with ID ' +
+      itemID + ' cost(s) Ɖ' + price.price * quantity[1] + '.';
   }
   return '';
 }

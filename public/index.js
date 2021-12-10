@@ -42,6 +42,10 @@
    *
    */
   function init() {
+    if (window.localStorage.getItem('user')) {
+      displayLoggedIn(window.localStorage.getItem('user'));
+      document.cookie = 'user=' + window.localStorage.getItem('user');
+    }
     requestItems();
     id('accounts-btn').addEventListener('click', accountView);
     id('home-btn').addEventListener('click', homeView);
@@ -80,7 +84,8 @@
   function buy() {
     let imgSrc = qs('#item-container > img').src;
     let itemID = imgSrc.substring(imgSrc.indexOf('img/') + 4, imgSrc.lastIndexOf('.'));
-    fetch(BUY_ITEM + itemID + '/' + id('user').textContent.substring(LOGGED_IN_AS.length) + '/' + id('quantity').value, {method: 'POST'})
+    let user = id('user').textContent.substring(LOGGED_IN_AS.length);
+    fetch(BUY_ITEM + itemID + '/' + (user ? user : 'none') + '/' + id('quantity').value, {method: 'POST'})
       .then(statusCheck)
       .then(res => res.json())
       .then((json) => {
@@ -95,7 +100,6 @@
     id('incomplete-transaction').classList.add('hidden');
     id('complete-transaction').classList.remove('hidden');
     requestItems();
-    console.log(itemID);
     requestSpecificItemDetails(parseInt(itemID));
   }
 
@@ -123,7 +127,8 @@
    */
   function login() {
     let data = new FormData();
-    data.append('user', id('lg-username').value);
+    let username = id('lg-username').value;
+    data.append('user', username);
     data.append('password', id('lg-password').value);
     fetch(LOGIN_ACCOUNT, {method: 'POST', body: data})
       .then(statusCheck)
@@ -138,6 +143,8 @@
    */
   function processLoginResponse(loginResponse) {
     if (loginResponse) {
+      window.localStorage.setItem('user', id('lg-username').value);
+      document.cookie = 'user=' + window.localStorage.getItem('user');
       displayLoggedIn(id('lg-username').value);
     } else {
       throw new Error("Please login again. You have a wrong username or wrong password.");
@@ -201,7 +208,6 @@
    * @param {*} json
    */
   function displaySearchResults(json) {
-    console.log(json);
     let items = qsa('#items > article');
     for (let i = 0; i < items.length; i++) {
       items[i].classList.remove('hidden');
@@ -474,13 +480,12 @@
   function submitFeedback() {
     let data = new FormData();
     let username = id('user').textContent.substring(LOGGED_IN_AS.length);
-    data.append('username', username);
+    data.append('username', (username ? username : 'none'));
     let imgSrc = qs('#item-container > img').src;
     let itemID = imgSrc.substring(imgSrc.indexOf('img/') + 4, imgSrc.lastIndexOf('.'));
     let score = qs('#feedback-form input').value;
     data.append('score', score);
     data.append('id', itemID);
-    console.log(itemID);
     data.append('description', qs('textarea').value);
     fetch(SUBMIT_FEEDBACK, {method: 'POST', body: data})
       .then(statusCheck)
@@ -494,7 +499,6 @@
    * @param {*} errorMessage
    */
   function handleError(errorMessage) {
-    console.log(errorMessage);
     id('error').textContent = errorMessage;
     id('error').classList.remove('hidden');
     setTimeout(function() {
