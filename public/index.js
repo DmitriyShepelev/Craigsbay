@@ -44,22 +44,23 @@
    *
    */
   function init() {
+    manageLocalStorage();
+    requestItems();
+    addAccountsEventListeners();
+    addItemsAndFeedbacksListeners();
+    addTransactionEventListeners();
+  }
+
+  function manageLocalStorage() {
     if (window.localStorage.getItem('user')) {
       displayLoggedIn(window.localStorage.getItem('user'));
       setUserDogeCoinBalance(window.localStorage.getItem('balance'));
       document.cookie = 'user=' + window.localStorage.getItem('user');
     }
-    requestItems();
+  }
+
+  function addAccountsEventListeners() {
     id('accounts-btn').addEventListener('click', accountView);
-    id('home-btn').addEventListener('click', homeView);
-    qs('div#filters > form > button').addEventListener('click', (event) => {
-      event.preventDefault();
-      updateDisplayedItems();
-    });
-    id('list').addEventListener('click', listView);
-    id('grid').addEventListener('click', gridView);
-    id('search-btn').addEventListener('click', search);
-    id('sign-up-btn').addEventListener('click', signUp);
     id('login-btn').addEventListener('click', loginView);
     qs('#sign-up form').addEventListener('submit', (event) => {
       event.preventDefault();
@@ -69,6 +70,27 @@
       event.preventDefault();
       login();
     });
+  }
+
+  function addItemsAndFeedbacksListeners() {
+    id('home-btn').addEventListener('click', homeView);
+    qs('div#filters > form > button').addEventListener('click', (event) => {
+      event.preventDefault();
+      updateDisplayedItems();
+    });
+    id('list').addEventListener('click', listView);
+    id('grid').addEventListener('click', gridView);
+    id('search-btn').addEventListener('click', search);
+    id('sign-up-btn').addEventListener('click', signUp);
+    
+    id('feedback-btn').addEventListener('click', makeFeedbackFormVisible);
+    qs('#item > article > form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      submitFeedback();
+    })
+  }
+
+  function addTransactionEventListeners() {
     qs('#item-container form').addEventListener('submit', (event) => {
       event.preventDefault();
       confirmTransaction();
@@ -76,11 +98,6 @@
     id('yes').addEventListener('click', buy);
     id('no').addEventListener('click', closeTransactionWindow);
     id('close').addEventListener('click', closeTransactionWindow);
-    id('feedback-btn').addEventListener('click', makeFeedbackFormVisible);
-    qs('#item > article > form').addEventListener('submit', (event) => {
-      event.preventDefault();
-      submitFeedback();
-    })
   }
 
   function closeTransactionWindow() {
