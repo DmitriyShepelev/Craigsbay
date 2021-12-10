@@ -59,7 +59,7 @@ div#filters {
   flex-direction: column;
 }
 
-#feedbacks > form > input {
+#item > article > form > input {
   width: 40px;
 }
 

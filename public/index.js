@@ -75,7 +75,12 @@
     });
     id('yes').addEventListener('click', buy);
     id('no').addEventListener('click', closeTransactionWindow);
-    id('close').addEventListener('click', closeTransactionWindow)
+    id('close').addEventListener('click', closeTransactionWindow);
+    id('feedback-btn').addEventListener('click', makeFeedbackFormVisible);
+    qs('#item > article > form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      submitFeedback();
+    })
   }
 
   function closeTransactionWindow() {
@@ -133,7 +138,7 @@
    * @param {*} balance 
    */
   function setUserDogeCoinBalance(balance) {
-    qs('#transactions p').textContent = 'Ɖ ' + String(balance); 
+    qs('#transactions p').textContent = 'Ɖ ' + String(balance);
   }
 
   /**
@@ -435,6 +440,7 @@
 
     id('description').nextElementSibling.textContent = json.description;
     addAllFeedback(json);
+    makeFeedbackButtonVisible();
     id('item').classList.remove('hidden');
   }
 
@@ -444,14 +450,6 @@
    */
   function addAllFeedback(json) {
     id('feedbacks').innerHTML = '';
-    let reviews = gen('h2');
-    reviews.textContent = 'Reviews:';
-    id('feedbacks').append(reviews);
-    let addFeedbackBtn = gen('button');
-    addFeedbackBtn.textContent = 'Add a review';
-    addFeedbackBtn.id = 'feedback-btn';
-    addFeedbackBtn.addEventListener('click', openFeedback);
-    id('feedbacks').append(addFeedbackBtn);
     for (let i = 0; i < json.feedbacks.length; i++) {
       let feedback = gen('article');
       feedback.appendChild(createStarRating(json.feedbacks[i].score));
@@ -464,32 +462,14 @@
     }
   }
 
-  function openFeedback() {
+  function makeFeedbackButtonVisible() {
+    id('feedback-btn').classList.remove('hidden');
+    qs('#item > article > form').classList.add('hidden');
+  }
+
+  function makeFeedbackFormVisible() {
     id('feedback-btn').classList.add('hidden');
-    let feedbackForm = gen('form');
-    feedbackForm.id = 'feedback-form';
-    feedbackForm.classList.add('flex-col');
-    let ratingInput = gen('input');
-    ratingInput.type = 'number';
-    ratingInput.min = 0;
-    ratingInput.max = 5;
-    ratingInput.required = true;
-    let ratingLabel = gen('label');
-    ratingLabel.textContent = 'Rating:';
-    feedbackForm.appendChild(ratingLabel);
-    feedbackForm.appendChild(ratingInput);
-    let textArea = gen('textarea');
-    textArea.required = true;
-    textArea.placeholder = 'Add a review here.';
-    feedbackForm.appendChild(textArea);
-    let submit = gen('button');
-    submit.textContent = 'Submit review';
-    feedbackForm.addEventListener('submit', (event) => {
-      event.preventDefault();
-      submitFeedback();
-    })
-    feedbackForm.appendChild(submit);
-    qs('#feedbacks h2').insertAdjacentElement('afterend', feedbackForm);
+    qs('#item > article > form').classList.remove('hidden');
   }
 
   function submitFeedback() {
@@ -506,6 +486,7 @@
       .then(statusCheck)
       .then(res => res.text())
       .then(() => requestSpecificItemDetails(parseInt(itemID)))
+      .then(makeFeedbackButtonVisible)
       .catch(handleError);
   }
 
