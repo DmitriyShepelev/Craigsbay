@@ -347,22 +347,21 @@
     item.appendChild(itemPicture);
     let viewDescContainer = gen('div');
     viewDescContainer.id = 'viewDescContainer';
-    let itemName = gen('p');
-    itemName.textContent = json.item_name;
-    viewDescContainer.appendChild(itemName);
-    let price = gen('p');
+
+    appendParagraph(viewDescContainer, json.item_name);
+    let price = appendParagraph(viewDescContainer, 'Ɖ' + json.price);
     price.classList.add('price');
-    price.textContent = 'Ɖ' + json.price;
-    viewDescContainer.appendChild(price);
-    let category = gen('p');
+    let category = appendParagraph(viewDescContainer, json.category);
     category.classList.add('category');
-    category.textContent = json.category;
-    viewDescContainer.appendChild(category);
+
     viewDescContainer.appendChild(createStarRating(json.avg_score));
-    let quantity = gen('p');
-    quantity.textContent = json.quantity > 10 ? 'More than 10 available' : json.quantity +
-                           ' available';
-    viewDescContainer.appendChild(quantity);
+
+    if (json.quantity > 10) {
+      appendParagraph(viewDescContainer, 'More than 10 available');
+    } else {
+      appendParagraph(viewDescContainer, String(json.quantity) + ' available');
+    }
+
     item.appendChild(viewDescContainer);
     return item;
   }
@@ -456,13 +455,10 @@
     for (let i = 0; i < json.feedbacks.length; i++) {
       let feedback = gen('article');
       feedback.appendChild(createStarRating(json.feedbacks[i].score));
-      let feedbackUser = gen('p');
-      feedbackUser.textContent = json.feedbacks[i].user_name;
-      feedback.appendChild(feedbackUser);
+      appendParagraph(feedback, json.feedbacks[i].user_name);
+
       if (json.feedbacks[i].feedback_text !== undefined) {
-        let feedbackContent = gen('p');
-        feedbackContent.textContent = json.feedbacks[i].feedback_text;
-        feedback.appendChild(feedbackContent);
+        appendParagraph(feedback, json.feedbacks[i].feedback_text);
       }
       id('feedbacks').appendChild(feedback);
     }
@@ -566,6 +562,7 @@
     let paragraph = gen('p');
     paragraph.textContent = pContent;
     element.append(paragraph);
+    return paragraph;
   }
 
   /**
