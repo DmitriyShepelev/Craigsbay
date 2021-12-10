@@ -175,7 +175,7 @@ text message `An error occurred on the server. Try again later.`.
 **Returned Data Format**: JSON
 
 **Description:** Verifies a user's username and password information, returning
-the user's balance if the verification was successful. Otherwise, returns 0.
+the user's balance if the verification was successful. Otherwise, returns -1.
 
 **Example Request:** `/login` with `user=jim` and `password=password`.
 
@@ -199,14 +199,14 @@ text message `An error occurred on the server. Try again later.`.
 
 **Returned Data Format**: Plain text
 
-**Description:** Creates an account, responding with `Success!` if the creation
-was successful.
+**Description:** Creates an account, responding with the default starting balance
+of the user if the creation was successful.
 
 **Example Request:** `/createaccount` with `username=Richard`,
 `password=asdfsd`, and `email=richard@gmail.com`.
 
 **Example Response:**
-`Success!`
+2500
 
 **Error Handling:**
 * `400` error:

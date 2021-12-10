@@ -44,6 +44,7 @@
   function init() {
     if (window.localStorage.getItem('user')) {
       displayLoggedIn(window.localStorage.getItem('user'));
+      setUserDogeCoinBalance(window.localStorage.getItem('balance'));
       document.cookie = 'user=' + window.localStorage.getItem('user');
     }
     requestItems();
@@ -101,6 +102,7 @@
     id('complete-transaction').classList.remove('hidden');
     requestItems();
     requestSpecificItemDetails(parseInt(itemID));
+    setUserDogeCoinBalance(json.balance);
   }
 
   function confirmTransaction() {
@@ -118,8 +120,18 @@
     data.append('email', id('email').value);
     fetch(CREATE_ACCOUNT, {method: 'POST', body: data})
       .then(statusCheck)
+      .then(res => res.json())
+      .then(setUserDogeCoinBalance)
       .then(() => displayLoggedIn(id('username').value))
       .catch((error) => handleError(error.message));
+  }
+
+  /**
+   * 
+   * @param {*} balance 
+   */
+  function setUserDogeCoinBalance(balance) {
+    qs('#transactions p').textContent = 'Ɖ ' + String(balance); 
   }
 
   /**
@@ -141,11 +153,13 @@
    *
    * @param {*} loginResponse
    */
-  function processLoginResponse(loginResponse) {
-    if (loginResponse) {
+  function processLoginResponse(loginBalance) {
+    if (loginBalance >= 0) {
       window.localStorage.setItem('user', id('lg-username').value);
+      window.localStorage.setItem('balance', loginBalance);
       document.cookie = 'user=' + window.localStorage.getItem('user');
       displayLoggedIn(id('lg-username').value);
+      setUserDogeCoinBalance(loginBalance);
     } else {
       throw new Error("Please login again. You have a wrong username or wrong password.");
     }
@@ -440,6 +454,9 @@
     for (let i = 0; i < json.feedbacks.length; i++) {
       let feedback = gen('article');
       feedback.appendChild(createStarRating(json.feedbacks[i].score));
+      let feedbackUser = gen('p');
+      feedbackUser.textContent = json.feedbacks[i].user_name;
+      feedback.appendChild(feedbackUser);
       if (json.feedbacks[i].feedback_text !== undefined) {
         let feedbackContent = gen('p');
         feedbackContent.textContent = json.feedbacks[i].feedback_text;

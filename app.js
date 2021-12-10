@@ -114,7 +114,7 @@ app.post('/login', async (req, res) => {
       if (dbResult && dbResult['user_password'] === req.body.password) {
         res.json(dbResult.balance);
       } else {
-        res.json(0);
+        res.json(-1);
       }
     } else {
       res.type('text').status(REQUEST_ERROR_NUM)
@@ -163,8 +163,9 @@ app.post('/createaccount', async (req, res) => {
       } else {
         await db.run('INSERT INTO Accounts (\'user_name\', \'user_password\', \'email\')' +
                      ' VALUES (?, ?, ?);', [req.body.username, req.body.password, req.body.email]);
+        let balance = await db.get(GET_BALANCE, [req.body.username]);
         db.close();
-        res.type('text').send('Success!');
+        res.json(balance);
       }
     } catch (error) {
       res.type('text').status(SERVER_ERROR_NUM)
