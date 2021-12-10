@@ -259,7 +259,7 @@ article.list {
   display: none;
 }
 
-#dropdown {
+.dropdown{
   position: absolute;
   z-index: 1;
 }
@@ -268,7 +268,7 @@ article.list {
   background-color: lightskyblue;
 }
 
-#dropdown-cntr:hover #dropdown {
+#dropdown-cntr:hover .dropdown {
   display: block;
 }
 
@@ -280,23 +280,28 @@ article.list {
 }
 
 #user {
-  text-align: end;
-  margin-right: 20px;
+  z-index: 1;
+  position: absolute;
+  margin-left: 85%;
 }
 
-.norm {
-  border-radius: 50px;
+#transactions > p {
+  font-size: 20px;
 }
 
-#sign-up-btn, #login-btn {
+#transactions {
+  text-align: center;
+}
+
+#sign-up-btn, #login-btn, #logout-btn {
   border-radius: 0px;
 }
 
-#dropdown > button {
+.dropdown > button {
   width: 100%;
 }
 
-#login-btn {
+#login-btn, #logout-btn {
   border-bottom-left-radius: 40px;
   border-bottom-right-radius: 40px;
   border-top-left-radius: 0px;
@@ -307,7 +312,7 @@ article.list {
   color: white;
 }
 
-nav div div button {
+nav  div div button {
   display: block;
   color: black;
   background-color: lightskyblue;

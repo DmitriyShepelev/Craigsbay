@@ -62,6 +62,7 @@
   function addAccountsEventListeners() {
     id('accounts-btn').addEventListener('click', accountView);
     id('login-btn').addEventListener('click', loginView);
+    id('logout-btn').addEventListener('click', logoutView);
     qs('#sign-up form').addEventListener('submit', (event) => {
       event.preventDefault();
       createAccount();
@@ -70,6 +71,18 @@
       event.preventDefault();
       login();
     });
+  }
+
+  function logoutView() {
+    window.localStorage.clear();
+    id('not-logged-in').classList.add('dropdown');
+    id('logged-in').classList.remove('dropdown');
+    id('logged-in').classList.add('hidden');
+    id('user').classList.add('hidden');
+    id('sign-up').classList.remove('hidden');
+    id('login').classList.remove('hidden');
+    id('sign-up-btn').classList.remove('hidden');
+    id('login-btn').classList.remove('hidden');
   }
 
   function addItemsAndFeedbacksListeners() {
@@ -82,7 +95,7 @@
     id('grid').addEventListener('click', gridView);
     id('search-btn').addEventListener('click', search);
     id('sign-up-btn').addEventListener('click', signUp);
-    
+
     id('feedback-btn').addEventListener('click', makeFeedbackFormVisible);
     qs('#item > article > form').addEventListener('submit', (event) => {
       event.preventDefault();
@@ -147,12 +160,16 @@
       .then(res => res.json())
       .then(setUserDogeCoinBalance)
       .then(() => displayLoggedIn(id('username').value))
+      .then(() => {
+        window.localStorage.setItem('user', id('username').value);
+        document.cookie = 'user=' + window.localStorage.getItem('user');
+      })
       .catch((error) => handleError(error.message));
   }
 
   /**
-   * 
-   * @param {*} balance 
+   *
+   * @param {*} balance
    */
   function setUserDogeCoinBalance(balance) {
     qs('#transactions p').textContent = 'Ɖ ' + String(balance);
@@ -193,16 +210,16 @@
    *
    */
   function displayLoggedIn(username) {
-    id('dropdown').classList.add('hidden');
+    id('not-logged-in').classList.add('hidden');
     id('user').textContent = LOGGED_IN_AS + username;
     id('user').classList.remove('hidden');
     id('sign-up').classList.add('hidden');
     id('login').classList.add('hidden');
     id('home').classList.remove('hidden');
+    id('not-logged-in').classList.remove('dropdown');
+    id('logged-in').classList.add('dropdown');
     id('sign-up-btn').classList.add('hidden');
     id('login-btn').classList.add('hidden');
-    id('dropdown-cntr').classList.add('norm');
-    id('accounts-btn').classList.add('norm');
   }
 
   /**
@@ -525,8 +542,8 @@
   function accountView() {
     id('home').classList.add('hidden');
     id('transactions').classList.remove('hidden');
-
-    fetch(GET_TRANSACTION + id('user').textContent.substring(LOGGED_IN_AS.length))
+    let username = id('user').textContent.substring(LOGGED_IN_AS.length);
+    fetch(GET_TRANSACTION + (username ? username  : 'none'))
       .then(statusCheck)
       .then(res => res.json())
       .then(displayTransactions)
@@ -551,7 +568,7 @@
     appendParagraph(transactionContainer, "Date: " + dateString);
 
     appendParagraph(transactionContainer, "Item name: " + transactionObj.item_name);
-    appendParagraph(transactionContainer, "Total cost: " + transactionObj.total_price);
+    appendParagraph(transactionContainer, "Total cost: Ɖ" + transactionObj.total_price);
     return transactionContainer;
   }
 
