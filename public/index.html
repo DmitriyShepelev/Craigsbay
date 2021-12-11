@@ -3,7 +3,7 @@
   Date: November 29, 2021
   Section: CSE 154 AC and TODO: Add Jim's section.
   TODO: Add comments.
- -->
+  -->
 <!DOCTYPE html>
 <html lang='en'>
   <head>
@@ -155,8 +155,8 @@
                     <img class='star' src='img/stars.png' alt='stars'>
                   </div>
                   <form>
-                    <input type='number' min='1' max='999' length='3' id='quantity' required>
-                    <label></label>
+                    <input type='number' min='1' max='999' id='quantity' required>
+                    <label for='quantity'></label>
                     <button class='green'>Buy</button>
                   </form>
                   <p id='description'>Description:</p>
@@ -166,8 +166,8 @@
               <h2>Reviews:</h2>
               <button id='feedback-btn'>Add a review</button>
               <form id='feedback-form' class='flex-col hidden'>
-                <label>Rating:</label>
-                <input type='number' min='0' max='5' required>
+                <label for='feedback-rating'>Rating:</label>
+                <input id='feedback-rating' type='number' min='0' max='5' required>
                 <textarea required placeholder='Add a review here.'></textarea>
                 <button>Submit review</button>
               </form>
