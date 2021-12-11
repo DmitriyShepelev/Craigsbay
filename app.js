@@ -63,6 +63,21 @@ const GET_ACCOUNTS = 'SELECT * FROM Accounts WHERE user_name = ?;';
 
 const GET_ITEM = 'SELECT * FROM Items WHERE item_id = ?;';
 
+const GET_USER_INFO = 'SELECT user_name, user_password, balance' +
+    ' FROM Accounts WHERE user_name = ?;';
+
+const ADD_ACCOUNT = 'INSERT INTO Accounts (\'user_name\', \'user_password\', \'email\')' +
+    ' VALUES (?, ?, ?);';
+
+const GET_QUANTITY = 'SELECT quantity FROM Items WHERE item_id = ?;';
+
+const GET_ITEMS = 'SELECT item_id, quantity, price, category, item_name FROM Items;';
+
+const GET_ITEMS_BY_SEARCH_QUERY = 'SELECT item_id FROM Items WHERE item_name LIKE ?' +
+    ' OR description LIKE ? OR category LIKE ?;';
+
+const GET_ONE_ITEM = 'SELECT * FROM Items WHERE item_id = ?;';
+
 // For application/x-www-form-urlencoded.
 app.use(express.urlencoded({extended: true})); // Built-in middleware.
 
@@ -107,9 +122,7 @@ app.post('/login', async (req, res) => {
   try {
     if (req.body.user && req.body.password) {
       let db = await getDBConnection();
-      let getUserInfoQuery = 'SELECT user_name, user_password, balance FROM ' +
-      'Accounts WHERE user_name = ?';
-      let dbResult = await db.get(getUserInfoQuery, [req.body.user]);
+      let dbResult = await db.get(GET_USER_INFO, [req.body.user]);
       db.close();
       if (dbResult && dbResult['user_password'] === req.body.password) {
         res.json(dbResult.balance);
@@ -161,8 +174,7 @@ app.post('/createaccount', async (req, res) => {
         res.type('text').status(REQUEST_ERROR_NUM)
           .send(req.body.username + ' already exists.');
       } else {
-        await db.run('INSERT INTO Accounts (\'user_name\', \'user_password\', \'email\')' +
-                     ' VALUES (?, ?, ?);', [req.body.username, req.body.password, req.body.email]);
+        await db.run(ADD_ACCOUNT, [req.body.username, req.body.password, req.body.email]);
         let userBalance = await db.get(GET_BALANCE, [req.body.username]);
         db.close();
         res.json(userBalance.balance);
@@ -183,7 +195,7 @@ app.post('/buy/:itemID/:username/:quantity', async (req, res) => {
     let itemID = req.params.itemID;
     let quantity = req.params.quantity;
     let username = req.params.username;
-    let currQuantity = await db.get('SELECT quantity FROM Items WHERE item_id = ?;', [itemID]);
+    let currQuantity = await db.get(GET_QUANTITY, [itemID]);
     let balance = await db.get(GET_BALANCE, [username]);
     let price = await db.get(GET_PRICE, [itemID]);
     let qnty = [currQuantity, quantity];
@@ -226,10 +238,10 @@ app.get('/transactions/:username', async (req, res) => {
  * Submit feedback containing the username, score, and feedback text.
  */
 app.post('/feedback', async (req, res) => {
+  res.type('text');
   let username = req.body.username;
   if (!username || !req.body.score || !req.body.description || !req.body.id) {
-    res.type('text').status(REQUEST_ERROR_NUM)
-      .send(MISSING_PARAMS);
+    res.status(REQUEST_ERROR_NUM).send(MISSING_PARAMS);
   } else {
     try {
       let db = await getDBConnection();
@@ -239,17 +251,15 @@ app.post('/feedback', async (req, res) => {
       let errResult = handleFeedbackErrors(userExists, username, itemExists, req.body.id, user);
       if (errResult !== '') {
         db.close();
-        res.type('text').status(REQUEST_ERROR_NUM)
-          .send(errResult);
+        res.status(REQUEST_ERROR_NUM).send(errResult);
       } else {
         await db.run(CREATE_FEEDBACK, [req.body.id, username,
           req.body.score, req.body.description]);
         db.close();
-        res.type('text').send('Success!');
+        res.send('Success!');
       }
     } catch (error) {
-      res.type('text').status(SERVER_ERROR_NUM)
-        .send(SERVER_ERROR_MSG);
+      res.status(SERVER_ERROR_NUM).send(SERVER_ERROR_MSG);
     }
   }
 });
@@ -332,7 +342,7 @@ async function transact(db, username, itemID, price, balance, quantity) {
  */
 async function getItemsFromTable() {
   let db = await getDBConnection();
-  let dbResult = await db.all('SELECT item_id, quantity, price, category, item_name FROM Items;');
+  let dbResult = await db.all(GET_ITEMS);
   for (let i = 0; i < dbResult.length; i++) {
     dbResult[i]['avg_score'] = await getAverageScore(dbResult[i].item_id);
   }
@@ -349,8 +359,7 @@ async function getItemsFromTable() {
 async function getItemsBySearchQuery(searchQuery) {
   let db = await getDBConnection();
   let likeClause = '%' + searchQuery + '%';
-  let dbResult = await db.all('SELECT item_id FROM Items WHERE item_name LIKE ?' +
-   ' OR description LIKE ? OR category LIKE ?;', [likeClause, likeClause, likeClause]);
+  let dbResult = await db.all(GET_ITEMS_BY_SEARCH_QUERY, [likeClause, likeClause, likeClause]);
   let itemIdArr = [];
   for (let i = 0; i < dbResult.length; i++) {
     itemIdArr.push(dbResult[i]['item_id']);
@@ -369,7 +378,7 @@ async function getItemsBySearchQuery(searchQuery) {
  */
 async function getItemFromTable(itemID) {
   let db = await getDBConnection();
-  let oneItemInfo = await db.get('SELECT * FROM Items WHERE item_id = ?', [itemID]);
+  let oneItemInfo = await db.get(GET_ONE_ITEM, [itemID]);
   if (oneItemInfo) {
     oneItemInfo['avg_score'] = await getAverageScore(itemID);
     oneItemInfo['feedbacks'] = await db.all(GET_ITEM_FEEDBACK_QUERY, [itemID]);

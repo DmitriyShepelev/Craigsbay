@@ -284,8 +284,10 @@ text message `An error occurred on the server. Try again later.`.
 * `400` error:
   * If the user is not logged in, return an error with the plain text message
   `You are not logged in.`.
-  * If the `username` or item with ID `id` does not exist, return an
-error with the plain text message `Your username or item ID does not exist.`
+  * If the `username` does not exist, return an error with the plain text message
+  `<username> is not a valid username.`
+  * If the item with ID `id` does not exist, return an
+error with the plain text message `'There is no valid item with ID <id>.`
 
 * `500` error: If there is a server-side error, return an error with the plain
 text message `An error occurred on the server. Try again later.`.
