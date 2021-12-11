@@ -9,7 +9,7 @@
   <head>
     <meta charset='utf-8'>
     <title>Craigsbay</title>
-    <link href="https://fonts.googleapis.com/css2?family=Comforter&display=swap" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css2?family=Comforter&display=swap' rel='stylesheet'>
     <link rel='stylesheet' href='styles.css'>
     <script src='index.js'></script>
   </head>
@@ -146,32 +146,32 @@
           <article id='item' class='hidden flex'>
             <article>
               <h2></h2>
-              <div id="item-container">
-                <img src="img/stars.png" alt="img/stars.png">
+              <div id='item-container'>
+                <img src='img/stars.png' alt='img/stars.png'>
                 <div>
-                  <p class="price"></p>
-                  <p class="category"></p>
-                  <div class="star-container" title="5">
-                    <img class="star" src="img/stars.png" alt="stars">
+                  <p class='price'></p>
+                  <p class='category'></p>
+                  <div class='star-container' title='5'>
+                    <img class='star' src='img/stars.png' alt='stars'>
                   </div>
                   <form>
-                    <input type="number" min="1" max="999" maxlength="3" id="quantity" required>
+                    <input type='number' min='1' max='999' length='3' id='quantity' required>
                     <label></label>
-                    <button class="green">Buy</button>
+                    <button class='green'>Buy</button>
                   </form>
-                  <p id="description">Description:</p>
+                  <p id='description'>Description:</p>
                   <p></p>
                 </div>
               </div>
               <h2>Reviews:</h2>
-              <button id="feedback-btn">Add a review</button>
-              <form id="feedback-form" class="flex-col hidden">
+              <button id='feedback-btn'>Add a review</button>
+              <form id='feedback-form' class='flex-col hidden'>
                 <label>Rating:</label>
-                <input type="number" min="0" max="5" required>
-                <textarea required placeholder="Add a review here."></textarea>
+                <input type='number' min='0' max='5' required>
+                <textarea required placeholder='Add a review here.'></textarea>
                 <button>Submit review</button>
               </form>
-              <section id="feedbacks">
+              <section id='feedbacks'>
               </section>
             </article>
           </article>
@@ -189,29 +189,17 @@
         <p>Usernames <strong>must</strong> contain <em>at least</em> one character.</p>
         <p>Passwords <strong>must</strong> contain <em>at least</em> six characters.</p>
         <form>
-          <label>
-            Username
-            <div class='input-cntr'>
-              <br>
-              <input id='username' type='text' name='sign-up' required minlength="1">
-            </div>
-          </label>
-
-          <label>
-            Password
-            <div class='input-cntr'>
-              <br>
-              <input id='password' type='password' name='sign-up' required minlength="6">
-            </div>
-          </label>
+          <label for='username'>Username</label>
           <br>
-          <label>
-            Email
-            <div class='input-cntr'>
-              <br>
-              <input id='email' type='email' name='sign-up'>
-            </div>
-          </label>
+          <input id='username' type='text' name='sign-up' required minlength='1'>
+          <br>
+          <label for='password'>Password</label>
+          <br>
+          <input id='password' type='password' name='sign-up' required minlength='6'>
+          <br>
+          <label for='email'>Email</label>
+          <br>
+          <input id='email' type='email' name='sign-up'>
           <br>
           <button class='green'>Submit</button>
         </form>
@@ -219,21 +207,12 @@
       <section id='login' class='hidden'>
         <h2>LOGIN</h2>
         <form>
-          <label>
-            Username
-            <div class='input-cntr'>
-              <br>
-              <input id='lg-username' type='text' name='lg-name' required minlength="1">
-            </div>
-          </label>
-
-          <label>
-            Password
-            <div class='input-cntr'>
-              <br>
-              <input id='lg-password' type='password' name='lg-password' required minlength="6">
-            </div>
-          </label>
+          <label for='lg-username'>Username</label>
+          <br>
+          <input id='lg-username' type='text' name='lg-name' required minlength='1'>
+          <label for='lg-password'>Password</label>
+          <br>
+          <input id='lg-password' type='password' name='lg-password' required minlength='6'>
           <br>
           <button class='green'>Submit</button>
         </form>
