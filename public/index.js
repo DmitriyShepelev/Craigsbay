@@ -45,7 +45,9 @@
   window.addEventListener('load', init);
 
   /**
-   *
+   * Initialize the client-side program by setting up local storage,
+   * requesting all items to fill in the page, and adding associated
+   * event listeners.
    */
   function init() {
     manageLocalStorage();
@@ -55,6 +57,10 @@
     addTransactionEventListeners();
   }
 
+  /**
+   * Manage the local storage of the website by getting some data
+   * from local storage if there is a data associated with this website.
+   */
   function manageLocalStorage() {
     if (window.localStorage.getItem('user')) {
       displayLoggedIn(window.localStorage.getItem('user'));
@@ -63,6 +69,9 @@
     }
   }
 
+  /**
+   * Add event listeners for buttons and interfaces related to the accounts.
+   */
   function addAccountsEventListeners() {
     id('accounts-btn').addEventListener('click', accountView);
     id('login-btn').addEventListener('click', loginView);
@@ -77,6 +86,10 @@
     });
   }
 
+  /**
+   * Display the user as being logged out from the program and clearing any
+   * persisting local storage.
+   */
   function logoutView() {
     window.localStorage.clear();
     document.cookie = 'user=; Max-Age=-9;';
@@ -93,6 +106,10 @@
     qs('#transactions > article').classList.add('hidden');
   }
 
+  /**
+   * Add the event listeners to buttons and interface related with
+   * the items and the feedbacks.
+   */
   function addItemsAndFeedbacksListeners() {
     id('home-btn').addEventListener('click', homeView);
     qs('div#filters > form > button').addEventListener('click', (event) => {
@@ -108,9 +125,12 @@
     qs('#item > article > form').addEventListener('submit', (event) => {
       event.preventDefault();
       submitFeedback();
-    })
+    });
   }
 
+  /**
+   * Add the event listeners for transactions related buttons and interfaces.
+   */
   function addTransactionEventListeners() {
     qs('#item-container form').addEventListener('submit', (event) => {
       event.preventDefault();
@@ -121,18 +141,31 @@
     id('close').addEventListener('click', closeTransactionWindow);
   }
 
+  /**
+   * Close the transaction window when the user is done with the transaction.
+   */
   function closeTransactionWindow() {
     id('transaction-confirmation').classList.add('hidden');
     id('incomplete-transaction').classList.remove('hidden');
     id('complete-transaction').classList.add('hidden');
   }
 
+  /**
+   * Perform the buying action by sending request to the server, and if successful,
+   * update the balance of the user.
+   */
   function buy() {
     let imgSrc = qs('#item-container > img').src;
-    let itemID = imgSrc.substring(imgSrc.indexOf(IMG_PATH) + IMG_PATH.length,
-                                  imgSrc.lastIndexOf('.'));
+    let itemID = imgSrc.substring(
+      imgSrc.indexOf(IMG_PATH) + IMG_PATH.length,
+      imgSrc.lastIndexOf('.')
+    );
+
     let user = id('user').textContent.substring(LOGGED_IN_AS.length);
-    fetch(BUY_ITEM + itemID + '/' + (user ? user : 'none') + '/' + id('quantity').value, {method: 'POST'})
+    fetch(
+      BUY_ITEM + itemID + '/' + (user ? user : 'none') + '/' + id('quantity').value,
+      {method: 'POST'}
+    )
       .then(statusCheck)
       .then(res => res.json())
       .then((json) => {
@@ -141,6 +174,14 @@
       .catch(handleError);
   }
 
+  /**
+   * Display the transaction, update the items page to contain the updated stocks, and
+   * update the amount of DogeCoin the user currently has.
+   * @param {JSONObject} json - the JSON object representing the data returned
+   *                            from the server when we send the request to
+   *                            buy an item for a user
+   * @param {Number} itemID - the item ID of the item that the user buy. 
+   */
   function updateBalance(json, itemID) {
     qs('#complete-transaction > p').textContent = 'Confirmation code: ' +
       json.confirmation_number;
@@ -151,13 +192,19 @@
     setUserDogeCoinBalance(json.balance);
   }
 
+  /**
+   * Add in a confirmation box that the user can click to either confirm or
+   * cancel the sale.
+   */
   function confirmTransaction() {
     id('transaction-confirmation').classList.remove('hidden');
     id('transaction-confirmation').classList.add('flex-col');
   }
 
   /**
-   *
+   * Handles the event where the user creates the account and send request to the server
+   * so the server would have information about the user's account as well. If successful,
+   * automatically log the user into the website.
    */
   function createAccount() {
     let data = new FormData();
@@ -177,15 +224,16 @@
   }
 
   /**
-   *
-   * @param {*} balance
+   * Set the Doge Coin balance of the user.
+   * @param {Number} balance - the amount of Doge Coin user currently has
    */
   function setUserDogeCoinBalance(balance) {
     qs('#transactions p').textContent = 'Ɖ ' + String(balance);
   }
 
   /**
-   *
+   * Handles the event where the user log into the program if they enter the
+   * right user name and password.
    */
   function login() {
     let data = new FormData();
@@ -200,8 +248,11 @@
   }
 
   /**
-   *
-   * @param {*} loginResponse
+   * Process the login response (the login balance) retrieved from the server and log
+   * the user into the program if the response is valid.
+   * @param {Number} loginBalance - the balance the user currently have. If the balance
+   *                                is negative, it means the user enters the wrong
+   *                                information.
    */
   function processLoginResponse(loginBalance) {
     if (loginBalance >= 0) {
@@ -216,7 +267,9 @@
   }
 
   /**
-   *
+   * Display the page when the user can successfully log into the program so that the user
+   * have access to the accounts page.
+   * @param {String} username - the username of the user who just logged into the program 
    */
   function displayLoggedIn(username) {
     id('not-logged-in').classList.add('hidden');
@@ -232,7 +285,7 @@
   }
 
   /**
-   *
+   * Handles the event when the sign up button is clicked and show the sign up page.
    */
   function signUp() {
     id('sign-up').classList.remove('hidden');
@@ -242,7 +295,7 @@
   }
 
   /**
-   *
+   * Handles the event when the login button is clicked and show the login page.
    */
   function loginView() {
     id('login').classList.remove('hidden');
@@ -252,7 +305,9 @@
   }
 
   /**
-   *
+   * Handles the event where the search button is clicked and send the request to the server
+   * so that the server searches for items based on the search query and display only the
+   * search results back to the user.
    */
   function search() {
     if (id('search-term').value.trim() !== '') {
@@ -268,8 +323,9 @@
   }
 
   /**
-   *
-   * @param {*} json
+   * Display the search results based on the data obtained from the server.
+   * @param {JSONObject} json - a JSON Object representing the ids of items that
+   *                            match the search query.
    */
   function displaySearchResults(json) {
     let items = qsa('#items > article');
@@ -284,7 +340,8 @@
   }
 
   /**
-   *
+   * Show the items sold on Craigsbay in form of a list where each row only
+   * contains 1 item.
    */
   function listView() {
     id('grid').classList.remove('selected');
@@ -299,7 +356,8 @@
   }
 
   /**
-   *
+   * Show the items sold on Craigsbay in form of a grid, where multiple items can be
+   * on one row, depending on the page width.
    */
   function gridView() {
     id('items').classList.add('flex');
@@ -314,38 +372,25 @@
   }
 
   /**
-   *
+   * Update the items displayed on the home page when the user hits the submit button
+   * such that the user only sees the items that match the filter.
    */
   function updateDisplayedItems() {
-    let notSelectedPrices = [];
-    let prices = qsa('article#price input:not(:checked)');
-    if (prices.length < NUM_PRICE_RANGES) {
-      for (let i = 0; i < prices.length; i++) {
-        let range = prices[i].value.split('–');
-        notSelectedPrices.push([parseInt(range[0]), parseInt(range[1])]);
-      }
-    }
-    let categories = qsa('article#category input:not(:checked)');
-    let notSelectedCategories = [];
-    if (categories.length < NUM_CATEGORIES) {
-      for (let i = 0; i < categories.length; i++) {
-        notSelectedCategories.push(categories[i].value.toUpperCase().charAt(0) +
-                                   categories[i].value.substring(1));
-      }
-    }
+    let notSelectedPrices = getNotSelectedPrices();
+    let notSelectedCategories = getNotSelectedCategories();
+
     let checkedRating = qs('article#rating input:checked');
     let rating = checkedRating === null ? 0 : checkedRating.value.charAt(0);
     let items = qsa('#items > article');
     for (let i = 0; i < items.length; i++) {
       items[i].classList.remove('hidden');
     }
-    outer:
+
     for (let i = 0; i < items.length; i++) {
       let price = items[i].querySelector('.price').textContent.substring(1);
       for (let j = 0; j < notSelectedPrices.length; j++) {
         if (price >= notSelectedPrices[j][0] && price <= notSelectedPrices[j][1]) {
           items[i].classList.add('hidden');
-          continue outer;
         }
       }
       let checkedTitle = items[i].querySelector('.star-container');
@@ -355,6 +400,42 @@
         items[i].classList.add('hidden');
       }
     }
+  }
+
+  /**
+   * Get the array of the price ranges that are not selected.
+   * @returns {PriceRange[]} an array of array of numbers representing the array of price
+   *                         ranges that is not selected by the user.
+   */
+  function getNotSelectedPrices() {
+    let notSelectedPrices = [];
+    let prices = qsa('article#price input:not(:checked)');
+    if (prices.length < NUM_PRICE_RANGES) {
+      for (let i = 0; i < prices.length; i++) {
+        let range = prices[i].value.split('–');
+        notSelectedPrices.push([parseInt(range[0]), parseInt(range[1])]);
+      }
+    }
+
+    return notSelectedPrices;
+  }
+
+  /**
+   * Get the array of categories that is not selected by the user.
+   * @returns {String[]} an array of String representing an array of categories that
+   *                     is not selected by the user
+   */
+  function getNotSelectedCategories() {
+    let categories = qsa('article#category input:not(:checked)');
+    let notSelectedCategories = [];
+    if (categories.length < NUM_CATEGORIES) {
+      for (let i = 0; i < categories.length; i++) {
+        notSelectedCategories.push(categories[i].value.toUpperCase().charAt(0) +
+                                   categories[i].value.substring(1));
+      }
+    }
+
+    return notSelectedCategories;
   }
 
   /**
@@ -372,8 +453,9 @@
   }
 
   /**
-   *
-   * @param {*} json
+   * Display each item in the "json" data onto the home page.
+   * @param {JSONObject} json - the JSON object representing the array of items on
+   *                            Craigsbay website.
    */
   function displayItems(json) {
     for (let i = 0; i < json.length; i++) {
