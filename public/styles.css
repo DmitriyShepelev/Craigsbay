@@ -133,8 +133,11 @@ nav, #search-bar, #content, .flex, #item-container {
   width: 400px;
 }
 
-#search-bar, #transaction-confirmation, .input-cntr, #sign-up form,
-  #login form {
+#search-bar,
+#transaction-confirmation,
+.input-cntr,
+#sign-up form,
+#login form {
   align-items: center;
 }
 
