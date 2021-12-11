@@ -13,6 +13,8 @@
 
   const SEARCH = '/search/';
 
+  const IMG_PATH = IMG_PATH;
+
   const SUBMIT_FEEDBACK = '/feedback';
 
   const LOGGED_IN_AS = 'Logged in as ';
@@ -33,8 +35,10 @@
 
   const NUM_CATEGORIES = 5;
 
+  const QUANTITY_THRESHOLD = 10;
+
   // Retrieved from http://clipart-library.com/clipart/riLo47oqT.htm
-  const STARS = 'img/stars.png';
+  const STARS = IMG_PATH + 'stars.png';
 
   const TWO_SECS = 5000;
 
@@ -123,7 +127,8 @@
 
   function buy() {
     let imgSrc = qs('#item-container > img').src;
-    let itemID = imgSrc.substring(imgSrc.indexOf('img/') + 4, imgSrc.lastIndexOf('.'));
+    let itemID = imgSrc.substring(imgSrc.indexOf(IMG_PATH) + IMG_PATH.length,
+                                  imgSrc.lastIndexOf('.'));
     let user = id('user').textContent.substring(LOGGED_IN_AS.length);
     fetch(BUY_ITEM + itemID + '/' + (user ? user : 'none') + '/' + id('quantity').value, {method: 'POST'})
       .then(statusCheck)
@@ -343,8 +348,8 @@
       }
       let checkedTitle = items[i].querySelector('.star-container');
       let title = checkedTitle === null ? 0 : checkedTitle.title;
-      if (notSelectedCategories.includes(items[i].querySelector('.category').textContent)
-          || title < rating) {
+      if (notSelectedCategories.includes(items[i].querySelector('.category').textContent) ||
+          title < rating) {
         items[i].classList.add('hidden');
       }
     }
@@ -397,8 +402,8 @@
 
     viewDescContainer.appendChild(createStarRating(json.avg_score));
 
-    if (json.quantity > 10) {
-      appendParagraph(viewDescContainer, 'More than 10 available');
+    if (json.quantity > QUANTITY_THRESHOLD) {
+      appendParagraph(viewDescContainer, 'More than ' + QUANTITY_THRESHOLD + ' available');
     } else {
       appendParagraph(viewDescContainer, String(json.quantity) + ' available');
     }
@@ -432,7 +437,7 @@
    */
   function createImage(json) {
     let itemPicture = gen('img');
-    itemPicture.src = 'img/' + json.item_id + '.png';
+    itemPicture.src = IMG_PATH + json.item_id + '.png';
     itemPicture.alt = json.item_name;
     return itemPicture;
   }
@@ -461,15 +466,16 @@
   function displaySpecificItemDetails(json) {
     id('items').classList.add('hidden');
     qs('#item > article > h2').textContent = json.item_name;
-    qs('#item-container > img').src = 'img/' + json.item_id + '.png';
+    qs('#item-container > img').src = IMG_PATH + json.item_id + '.png';
     qs('#item-container > img').alt = json.item_name;
     qs('#item-container .price').textContent = 'Price: Ɖ' + json.price;
     qs('#item-container .category').textContent = 'Category: ' + json.category;
     qs('#item-container input').max = json.quantity;
     let prevStar = qs('#item-container .star-container');
     prevStar.parentElement.replaceChild(createStarRating(json.avg_score), prevStar);
-    if (json.quantity > 10) {
-      qs('#item-container form label').textContent = ' More than 10 available';
+    if (json.quantity > QUANTITY_THRESHOLD) {
+      qs('#item-container form label').textContent = ' More than ' +
+        QUANTITY_THRESHOLD + ' available';
     } else {
       qs('#item-container form label').textContent = json.quantity + ' available';
     }
@@ -513,7 +519,7 @@
     let username = id('user').textContent.substring(LOGGED_IN_AS.length);
     data.append('username', (username ? username : 'none'));
     let imgSrc = qs('#item-container > img').src;
-    let itemID = imgSrc.substring(imgSrc.indexOf('img/') + 4, imgSrc.lastIndexOf('.'));
+    let itemID = imgSrc.substring(imgSrc.indexOf(IMG_PATH) + 4, imgSrc.lastIndexOf('.'));
     let score = qs('#feedback-form input').value;
     data.append('score', score);
     data.append('id', itemID);
@@ -547,7 +553,7 @@
     id('login').classList.add('hidden');
     id('transactions').classList.remove('hidden');
     let username = id('user').textContent.substring(LOGGED_IN_AS.length);
-    fetch(GET_TRANSACTION + (username ? username  : 'none'))
+    fetch(GET_TRANSACTION + (username ? username : 'none'))
       .then(statusCheck)
       .then(res => res.json())
       .then(displayTransactions)
@@ -575,7 +581,6 @@
     appendParagraph(transactionContainer, "Total cost: Ɖ" + transactionObj.total_price);
     return transactionContainer;
   }
-
 
   function appendParagraph(element, pContent) {
     let paragraph = gen('p');
@@ -620,7 +625,7 @@
    * @param {String} idName - element ID
    * @returns {Object} DOM object associated with id.
    */
-   function id(idName) {
+  function id(idName) {
     return document.getElementById(idName);
   }
 
@@ -650,5 +655,4 @@
   function gen(tagName) {
     return document.createElement(tagName);
   }
-
 })();
