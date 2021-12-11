@@ -318,7 +318,7 @@
         .catch(() => {
           handleError('Ooops. There was an error searching for ' +
                       id('search-term').value + '.');
-        })
+        });
     }
   }
 
@@ -531,8 +531,8 @@
     if (Number.isInteger(itemID)) {
       item = itemID;
     } else {
-      item = this.src.substring(this.src.indexOf('img') + LOGGED_IN.length,
-                                this.src.lastIndexOf('.'));
+      let startIndex = this.src.indexOf('img') + LOGGED_IN_AS.length;
+      item = this.src.substring(startIndex, this.src.lastIndexOf('.'));
     }
     fetch(ITEM + item)
       .then(statusCheck)
@@ -612,8 +612,8 @@
     let username = id('user').textContent.substring(LOGGED_IN_AS.length);
     data.append('username', (username ? username : 'none'));
     let imgSrc = qs('#item-container > img').src;
-    let itemID = imgSrc.substring(imgSrc.indexOf(IMG_PATH) + IMG_PATH.length,
-                                  imgSrc.lastIndexOf('.'));
+    let startIndex = imgSrc.indexOf(IMG_PATH) + IMG_PATH.length;
+    let itemID = imgSrc.substring(startIndex, imgSrc.lastIndexOf('.'));
     let score = qs('#feedback-form input').value;
     data.append('score', score);
     data.append('id', itemID);
