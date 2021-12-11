@@ -189,12 +189,16 @@ app.post('/createaccount', async (req, res) => {
 /**
  * Allows a user to buy an item.
  */
-app.post('/buy/:itemID/:username/:quantity', async (req, res) => {
+app.post('/buy', async (req, res) => {
+  if (!req.body.id || !req.body.user || !req.body.quantity) {
+    res.type('text').status(REQUEST_ERROR_NUM)
+      .send(MISSING_PARAMS);
+  }
   try {
     let db = await getDBConnection();
-    let itemID = req.params.itemID;
-    let quantity = req.params.quantity;
-    let username = req.params.username;
+    let itemID = req.body.id;
+    let quantity = req.body.quantity;
+    let username = req.body.user;
     let currQuantity = await db.get(GET_QUANTITY, [itemID]);
     let balance = await db.get(GET_BALANCE, [username]);
     let price = await db.get(GET_PRICE, [itemID]);
@@ -240,7 +244,7 @@ app.get('/transactions/:username', async (req, res) => {
 app.post('/feedback', async (req, res) => {
   res.type('text');
   let username = req.body.username;
-  if (!username || !req.body.score || !req.body.description || !req.body.id) {
+  if (!username || !req.body.score || !req.body.id) {
     res.status(REQUEST_ERROR_NUM).send(MISSING_PARAMS);
   } else {
     try {
@@ -254,7 +258,7 @@ app.post('/feedback', async (req, res) => {
         res.status(REQUEST_ERROR_NUM).send(errResult);
       } else {
         await db.run(CREATE_FEEDBACK, [req.body.id, username,
-          req.body.score, req.body.description]);
+          req.body.score, (req.body.description ? req.body.description : '')]);
         db.close();
         res.send('Success!');
       }

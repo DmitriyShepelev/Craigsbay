@@ -27,7 +27,7 @@
 
   const LOGIN_ACCOUNT = '/login';
 
-  const BUY_ITEM = '/buy/';
+  const BUY_ITEM = '/buy';
 
   const GET_TRANSACTION = '/transactions/';
 
@@ -164,12 +164,12 @@
       imgSrc.indexOf(IMG_PATH) + IMG_PATH.length,
       imgSrc.lastIndexOf('.')
     );
-
+    let data = new FormData();
     let user = id('user').textContent.substring(LOGGED_IN_AS.length);
-    fetch(
-      BUY_ITEM + itemID + '/' + (user ? user : 'none') + '/' + id('quantity').value,
-      {method: 'POST'}
-    )
+    data.append('id', itemID);
+    data.append('user', (user ? user : 'N/A'));
+    data.append('quantity', id('quantity').value);
+    fetch(BUY_ITEM, {method: 'POST', body: data})
       .then(statusCheck)
       .then(res => res.json())
       .then((json) => {
@@ -531,7 +531,7 @@
     if (Number.isInteger(itemID)) {
       item = itemID;
     } else {
-      let startIndex = this.src.indexOf('img') + LOGGED_IN_AS.length;
+      let startIndex = this.src.indexOf(IMG_PATH) + IMG_PATH.length;
       item = this.src.substring(startIndex, this.src.lastIndexOf('.'));
     }
     fetch(ITEM + item)
