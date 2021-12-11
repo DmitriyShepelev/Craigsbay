@@ -13,7 +13,7 @@
 
   const SEARCH = '/search/';
 
-  const IMG_PATH = IMG_PATH;
+  const IMG_PATH = 'img/';
 
   const SUBMIT_FEEDBACK = '/feedback';
 
@@ -79,6 +79,7 @@
 
   function logoutView() {
     window.localStorage.clear();
+    document.cookie = 'user=; Max-Age=-9;';
     id('user').textContent = '';
     qs('#transactions > p').textContent = 'Ɖ 0';
     id('home').classList.remove('hidden');
@@ -89,6 +90,7 @@
     id('user').classList.add('hidden');
     id('sign-up-btn').classList.remove('hidden');
     id('login-btn').classList.remove('hidden');
+    qs('#transactions > article').classList.add('hidden');
   }
 
   function addItemsAndFeedbacksListeners() {
