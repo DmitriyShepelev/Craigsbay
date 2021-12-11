@@ -226,22 +226,23 @@ app.get('/transactions/:username', async (req, res) => {
  * Submit feedback containing the username, score, and feedback text.
  */
 app.post('/feedback', async (req, res) => {
-  if (!req.body.username || !req.body.score || !req.body.description || !req.body.id) {
+  let username = req.body.username;
+  if (!username || !req.body.score || !req.body.description || !req.body.id) {
     res.type('text').status(REQUEST_ERROR_NUM)
       .send(MISSING_PARAMS);
   } else {
     try {
       let db = await getDBConnection();
-      let userExists = await db.get(GET_ACCOUNTS, [req.body.username]);
+      let userExists = await db.get(GET_ACCOUNTS, [username]);
       let itemExists = await db.get(GET_ITEM, [req.body.id]);
-      let errResult = feedbackErrorHandling(userExists, req.body.username, itemExists, req.body.id,
-                                            req.cookies.user);
+      let user = req.cookies.user;
+      let errResult = handleFeedbackErrors(userExists, username, itemExists, req.body.id, user);
       if (errResult !== '') {
         db.close();
         res.type('text').status(REQUEST_ERROR_NUM)
           .send(errResult);
       } else {
-        await db.run(CREATE_FEEDBACK, [req.body.id, req.body.username,
+        await db.run(CREATE_FEEDBACK, [req.body.id, username,
           req.body.score, req.body.description]);
         db.close();
         res.type('text').send('Success!');
@@ -255,17 +256,17 @@ app.post('/feedback', async (req, res) => {
 
 /**
  * Handles errors related to submitting feedback.
- * @param {object} userExists an object that is not null/undefined iff the user
+ * @param {object} userExists not null/undefined iff the user
  * submitting the feedback exists.
  * @param {string} username the username of the user submitting feedback.
- * @param {object} itemExists an object that is not null/undefined iff the item for which
+ * @param {object} itemExists not null/undefined iff the item for which
  * the user is submitting a feedback exists.
  * @param {number} itemID the ID of the item to leave feedback on.
- * @param {object} loggedIn an object that is not null/undefined iff the user seeking
+ * @param {object} loggedIn not null/undefined iff the user seeking
  * to submit feedback is logged in.
  * @returns {string} representing the error, if one exists; otherwise, returns an empty string.
  */
-function feedbackErrorHandling(userExists, username, itemExists, itemID, loggedIn) {
+function handleFeedbackErrors(userExists, username, itemExists, itemID, loggedIn) {
   if (!loggedIn) {
     return 'You are not logged in.';
   } else if (!userExists) {
@@ -276,7 +277,18 @@ function feedbackErrorHandling(userExists, username, itemExists, itemID, loggedI
   return '';
 }
 
-
+/**
+ * Handles errors related to completing a transaction.
+ * @param {object} quantity the quantity of the item to purchase and the
+ * quantity of items requested to purchase.
+ * @param {object} balance the user's balance.
+ * @param {price} price the item's price.
+ * @param {number} itemID the item's ID.
+ * @param {string} username the user's username.
+ * @param {object} loggedIn not null/undefined iff the user is logged in.
+ * @returns {string} representing the error, if it exists; otherwise, returns an
+ * empty string.
+ */
 function handleTransactErrors(quantity, balance, price, itemID, username, loggedIn) {
   if (!loggedIn) {
     return 'You are not logged in';
