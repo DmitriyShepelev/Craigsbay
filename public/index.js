@@ -621,10 +621,9 @@
     fetch(SUBMIT_FEEDBACK, {method: 'POST', body: data})
       .then(statusCheck)
       .then(res => res.text())
-      .then(() => {
-        requestSpecificItemDetails(parseInt(itemID));
-        makeFeedbackButtonVisible();
-      })
+      .then(() => requestSpecificItemDetails(parseInt(itemID)))
+      .then(makeFeedbackButtonVisible)
+      .then(requestItems)
       .catch(handleError);
   }
 
