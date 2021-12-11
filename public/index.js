@@ -2,7 +2,11 @@
  * Name: Dmitriy Shepelev and Jim Supawish
  * Date: November 29, 2021
  * Section: CSE 154 AC
- * TODO: Add comments.
+ * This is the JavaScript to add interactivity to the Craigsbay website. Users
+ * can view items for sale, filter items based on categories, search for items
+ * matching a search query, view their account balance, view their transaction
+ * history, purchase items, submit reviews for items, and login, sign-out, and
+ * log-out of their accounts.
  */
 'use strict';
 (function() {
@@ -175,12 +179,11 @@
   }
 
   /**
-   * Display the transaction, update the items page to contain the updated stocks, and
+   * Display the transaction, update the item's quantity, and
    * update the amount of DogeCoin the user currently has.
-   * @param {JSONObject} json - the JSON object representing the data returned
-   *                            from the server when we send the request to
-   *                            buy an item for a user
-   * @param {Number} itemID - the item ID of the item that the user buy. 
+   * @param {object} json the JSON object containing the purchase's confirmation
+   * code and the user's balance after the transaction.
+   * @param {number} itemID the ID of the item that the user buys.
    */
   function updateBalance(json, itemID) {
     qs('#complete-transaction > p').textContent = 'Confirmation code: ' +
@@ -202,9 +205,7 @@
   }
 
   /**
-   * Handles the event where the user creates the account and send request to the server
-   * so the server would have information about the user's account as well. If successful,
-   * automatically log the user into the website.
+   * Creates a user account and, if successful, displays the user as logged-in.
    */
   function createAccount() {
     let data = new FormData();
@@ -224,16 +225,15 @@
   }
 
   /**
-   * Set the Doge Coin balance of the user.
-   * @param {Number} balance - the amount of Doge Coin user currently has
+   * Set the user's DogeCoin balance.
+   * @param {number} balance the user's DogeCoin balance.
    */
   function setUserDogeCoinBalance(balance) {
     qs('#transactions p').textContent = 'Ɖ ' + String(balance);
   }
 
   /**
-   * Handles the event where the user log into the program if they enter the
-   * right user name and password.
+   * Tries to log-in the user.
    */
   function login() {
     let data = new FormData();
@@ -250,8 +250,8 @@
   /**
    * Process the login response (the login balance) retrieved from the server and log
    * the user into the program if the response is valid.
-   * @param {Number} loginBalance - the balance the user currently have. If the balance
-   *                                is negative, it means the user enters the wrong
+   * @param {number} loginBalance - the balance the user currently has. If the balance
+   *                                is negative, it means the user entered the wrong
    *                                information.
    */
   function processLoginResponse(loginBalance) {
@@ -262,14 +262,14 @@
       displayLoggedIn(id('lg-username').value);
       setUserDogeCoinBalance(loginBalance);
     } else {
-      throw new Error("Please login again. You have a wrong username or wrong password.");
+      throw new Error('Please login again. You have a wrong username or wrong password.');
     }
   }
 
   /**
    * Display the page when the user can successfully log into the program so that the user
-   * have access to the accounts page.
-   * @param {String} username - the username of the user who just logged into the program 
+   * has access to the accounts page.
+   * @param {string} username the username of the logged-in user.
    */
   function displayLoggedIn(username) {
     id('not-logged-in').classList.add('hidden');
@@ -285,7 +285,7 @@
   }
 
   /**
-   * Handles the event when the sign up button is clicked and show the sign up page.
+   * Handles the event when the sign up button is clicked by showing the sign up page.
    */
   function signUp() {
     id('sign-up').classList.remove('hidden');
@@ -295,7 +295,7 @@
   }
 
   /**
-   * Handles the event when the login button is clicked and show the login page.
+   * Handles the event when the login button is clicked by showing the login page.
    */
   function loginView() {
     id('login').classList.remove('hidden');
@@ -324,7 +324,7 @@
 
   /**
    * Display the search results based on the data obtained from the server.
-   * @param {JSONObject} json - a JSON Object representing the ids of items that
+   * @param {object} json - a JSON Object representing the ids of items that
    *                            match the search query.
    */
   function displaySearchResults(json) {
@@ -340,8 +340,8 @@
   }
 
   /**
-   * Show the items sold on Craigsbay in form of a list where each row only
-   * contains 1 item.
+   * Show the items in the form of a list, where each row only
+   * contains one item.
    */
   function listView() {
     id('grid').classList.remove('selected');
@@ -356,8 +356,8 @@
   }
 
   /**
-   * Show the items sold on Craigsbay in form of a grid, where multiple items can be
-   * on one row, depending on the page width.
+   * Show the items in the form of a grid, where multiple items can be
+   * on one row (depending on the page width).
    */
   function gridView() {
     id('items').classList.add('flex');
@@ -403,9 +403,8 @@
   }
 
   /**
-   * Get the array of the price ranges that are not selected.
-   * @returns {PriceRange[]} an array of array of numbers representing the array of price
-   *                         ranges that is not selected by the user.
+   * Get the price ranges not selected by the user.
+   * @returns {object} representing price ranges not selected by the user.
    */
   function getNotSelectedPrices() {
     let notSelectedPrices = [];
@@ -416,14 +415,12 @@
         notSelectedPrices.push([parseInt(range[0]), parseInt(range[1])]);
       }
     }
-
     return notSelectedPrices;
   }
 
   /**
-   * Get the array of categories that is not selected by the user.
-   * @returns {String[]} an array of String representing an array of categories that
-   *                     is not selected by the user
+   * Get the categories not selected by the user.
+   * @returns {object} representing an array of categories not selected by the user.
    */
   function getNotSelectedCategories() {
     let categories = qsa('article#category input:not(:checked)');
@@ -434,7 +431,6 @@
                                    categories[i].value.substring(1));
       }
     }
-
     return notSelectedCategories;
   }
 
@@ -453,9 +449,8 @@
   }
 
   /**
-   * Display each item in the "json" data onto the home page.
-   * @param {JSONObject} json - the JSON object representing the array of items on
-   *                            Craigsbay website.
+   * Display each item on the Home page.
+   * @param {object} json the JSON object containing the items to display.
    */
   function displayItems(json) {
     for (let i = 0; i < json.length; i++) {
@@ -464,9 +459,9 @@
   }
 
   /**
-   *
-   * @param {*} json
-   * @returns
+   * Constructs an item to be displayed in the Home view.
+   * @param {object} json the JSON containing the item data.
+   * @returns {object} representing the item.
    */
   function constructItem(json) {
     let item = gen('article');
@@ -497,9 +492,9 @@
   }
 
   /**
-   *
-   * @param {*} score
-   * @returns
+   * Creates a star rating for an item.
+   * @param {number} score the item's score/rating.
+   * @returns {object} containing the star rating for an item.
    */
   function createStarRating(score) {
     let starDiv = gen('div');
@@ -515,9 +510,9 @@
   }
 
   /**
-   *
-   * @param {*} json
-   * @returns
+   * Creates an item image.
+   * @param {object} json the JSON containing the item's ID and name.
+   * @returns {object} representing the item image.
    */
   function createImage(json) {
     let itemPicture = gen('img');
@@ -527,14 +522,17 @@
   }
 
   /**
-   *
+   * Request specific item details for an item with ID itemID.
+   * @param {number} itemID if not null/undefined, the item ID; otherwise, a
+   * dummy no-op argument.
    */
   function requestSpecificItemDetails(itemID) {
     let item;
     if (Number.isInteger(itemID)) {
       item = itemID;
     } else {
-      item = this.src.substring(this.src.indexOf('img') + 4, this.src.lastIndexOf('.'));
+      item = this.src.substring(this.src.indexOf('img') + LOGGED_IN.length,
+                                this.src.lastIndexOf('.'));
     }
     fetch(ITEM + item)
       .then(statusCheck)
@@ -544,8 +542,10 @@
   }
 
   /**
-   *
-   * @param {*} json
+   * Display a view containing an item's specific details, which include the
+   * item name, quantity, price, description, image, category, rating, and
+   * description.
+   * @param {object} json the JSON containing the item's specific details.
    */
   function displaySpecificItemDetails(json) {
     id('items').classList.add('hidden');
@@ -571,8 +571,8 @@
   }
 
   /**
-   * Add all feedbacks from json to an item page
-   * @param {*} json
+   * Add feedbacks to a specific item.
+   * @param {object} json the JSON containing the feedbacks.
    */
   function addAllFeedback(json) {
     id('feedbacks').innerHTML = '';
@@ -588,22 +588,32 @@
     }
   }
 
+  /**
+   * Makes the feedback button visible.
+   */
   function makeFeedbackButtonVisible() {
     id('feedback-btn').classList.remove('hidden');
     qs('#item > article > form').classList.add('hidden');
   }
 
+  /**
+   * Makes the feedback form visible.
+   */
   function makeFeedbackFormVisible() {
     id('feedback-btn').classList.add('hidden');
     qs('#item > article > form').classList.remove('hidden');
   }
 
+  /**
+   * Submits user feedback on an item.
+   */
   function submitFeedback() {
     let data = new FormData();
     let username = id('user').textContent.substring(LOGGED_IN_AS.length);
     data.append('username', (username ? username : 'none'));
     let imgSrc = qs('#item-container > img').src;
-    let itemID = imgSrc.substring(imgSrc.indexOf(IMG_PATH) + 4, imgSrc.lastIndexOf('.'));
+    let itemID = imgSrc.substring(imgSrc.indexOf(IMG_PATH) + IMG_PATH.length,
+                                  imgSrc.lastIndexOf('.'));
     let score = qs('#feedback-form input').value;
     data.append('score', score);
     data.append('id', itemID);
@@ -611,14 +621,16 @@
     fetch(SUBMIT_FEEDBACK, {method: 'POST', body: data})
       .then(statusCheck)
       .then(res => res.text())
-      .then(() => requestSpecificItemDetails(parseInt(itemID)))
-      .then(makeFeedbackButtonVisible)
+      .then(() => {
+        requestSpecificItemDetails(parseInt(itemID));
+        makeFeedbackButtonVisible();
+      })
       .catch(handleError);
   }
 
   /**
-   *
-   * @param {*} errorMessage
+   * Handles an error by displaying it for two seconds.
+   * @param {string} errorMessage the error message to display.
    */
   function handleError(errorMessage) {
     id('error').textContent = errorMessage;
@@ -644,28 +656,41 @@
       .catch(handleError);
   }
 
+  /**
+   * Displays the logged-in user's transaction history.
+   * @param {object} transactions a container for the user's transactions.
+   */
   function displayTransactions(transactions) {
-    qs('#transactions article').innerHTML = "";
-
+    qs('#transactions article').innerHTML = '';
     for (let i = 0; i < transactions.length; i++) {
       let currTransaction = createIndividualTransaction(transactions[i]);
       qs('#transactions article').appendChild(currTransaction);
     }
   }
 
+  /**
+   * Creates a transaction containing an ID, date, item name, and total cost.
+   * @param {object} transactionObj a container for the transaction ID, date,
+   * item name, and total cost.
+   * @returns {object} representing the transaction.
+   */
   function createIndividualTransaction(transactionObj) {
     let transactionContainer = gen('article');
-
-    let transactionIdPart = "Transaction id: " + transactionObj.transaction_id;
+    let transactionIdPart = 'Transaction id: ' + transactionObj.transaction_id;
     appendParagraph(transactionContainer, transactionIdPart);
     let dateString = (new Date(transactionObj.transaction_date)).toLocaleString();
-    appendParagraph(transactionContainer, "Date: " + dateString);
-
-    appendParagraph(transactionContainer, "Item name: " + transactionObj.item_name);
-    appendParagraph(transactionContainer, "Total cost: Ɖ" + transactionObj.total_price);
+    appendParagraph(transactionContainer, 'Date: ' + dateString);
+    appendParagraph(transactionContainer, 'Item name: ' + transactionObj.item_name);
+    appendParagraph(transactionContainer, 'Total cost: Ɖ' + transactionObj.total_price);
     return transactionContainer;
   }
 
+  /**
+   * Appends a paragraph with specified content to a specified element.
+   * @param {object} element the element to append the paragraph.
+   * @param {string} pContent the text content of the paragraph to append.
+   * @returns {object} representing the paragraph that was appended.
+   */
   function appendParagraph(element, pContent) {
     let paragraph = gen('p');
     paragraph.textContent = pContent;
