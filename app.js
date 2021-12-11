@@ -186,8 +186,8 @@ app.post('/buy/:itemID/:username/:quantity', async (req, res) => {
     let currQuantity = await db.get('SELECT quantity FROM Items WHERE item_id = ?;', [itemID]);
     let balance = await db.get(GET_BALANCE, [username]);
     let price = await db.get(GET_PRICE, [itemID]);
-    let errResult = handleTransactErrors([currQuantity, quantity], balance, price, itemID,
-      username, req.cookies.user);
+    let qnty = [currQuantity, quantity];
+    let errResult = handleTransactErrors(qnty, balance, price, itemID, username, req.cookies.user);
     if (errResult !== '') {
       db.close();
       res.type('text').status(REQUEST_ERROR_NUM)
@@ -254,13 +254,16 @@ app.post('/feedback', async (req, res) => {
 });
 
 /**
- *
- * @param {*} userExists
- * @param {*} username
- * @param {*} itemExists
- * @param {*} itemID
- * @param {*} loggedIn
- * @returns
+ * Handles errors related to submitting feedback.
+ * @param {object} userExists an object that is not null/undefined iff the user
+ * submitting the feedback exists.
+ * @param {string} username the username of the user submitting feedback.
+ * @param {object} itemExists an object that is not null/undefined iff the item for which
+ * the user is submitting a feedback exists.
+ * @param {number} itemID the ID of the item to leave feedback on.
+ * @param {object} loggedIn an object that is not null/undefined iff the user seeking
+ * to submit feedback is logged in.
+ * @returns {string} representing the error, if one exists; otherwise, returns an empty string.
  */
 function feedbackErrorHandling(userExists, username, itemExists, itemID, loggedIn) {
   if (!loggedIn) {
@@ -273,17 +276,7 @@ function feedbackErrorHandling(userExists, username, itemExists, itemID, loggedI
   return '';
 }
 
-/**
- * Handles transaction errors.
- * @param {object} currQuantity the current quantity of the item to buy.
- * @param {number} quantity the quantity requested to buy.
- * @param {object} balance the buyer's money balance.
- * @param {object} price the price of the item to buy.
- * @param {number} itemID the id of the item to buy.
- * @param {string} username the buyer's username.
- * @returns {string} representing the error, if there is one; otherwise, an empty string
- * representing no error.
- */
+
 function handleTransactErrors(quantity, balance, price, itemID, username, loggedIn) {
   if (!loggedIn) {
     return 'You are not logged in';
@@ -343,7 +336,7 @@ async function getItemsFromTable() {
  */
 async function getItemsBySearchQuery(searchQuery) {
   let db = await getDBConnection();
-  let likeClause = '%' + searchQuery +'%';
+  let likeClause = '%' + searchQuery + '%';
   let dbResult = await db.all('SELECT item_id FROM Items WHERE item_name LIKE ?' +
    ' OR description LIKE ? OR category LIKE ?;', [likeClause, likeClause, likeClause]);
   let itemIdArr = [];
