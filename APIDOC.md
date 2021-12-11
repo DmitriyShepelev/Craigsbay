@@ -199,8 +199,8 @@ text message `An error occurred on the server. Try again later.`.
 
 **Returned Data Format**: Plain text
 
-**Description:** Creates an account with the `username`, `password`, and
-`email` information, and responds with the default starting balance
+**Description:** Creates and stores an account with the `username`, `password`,
+and `email` information, and responds with the default starting balance
 of the user if the creation was successful.
 
 **Example Request:** `/createaccount` with `username=Richard`,
@@ -229,7 +229,7 @@ text message `An error occurred on the server. Try again later.`.
 **Description:** Allows user with username `user` to buy `quantity` item(s) with item
 id of `id`. Returns `confirmation_code` representing the transaction's
 confirmation code/id and `balance` representing the user's balance after the
-purchase.
+purchase. Stores the transaction, updated balance, and updated item quantity.
 
 **Example Request:** `/buy` with POST parameters `user=David`, `id=4`, `quantity=2`
 
@@ -244,7 +244,7 @@ purchase.
 
 **Error Handling:**
 * `400` error:
-  * If at least one of the POST parameters is missing, return an error with plain 
+  * If at least one of the POST parameters is missing, return an error with plain
   text message `At least one POST parameter is missing.`
   * If the user is not logged in, return an error with the plain text message
   `You are not logged in.`.
@@ -273,7 +273,7 @@ text message `An error occurred on the server. Try again later.`.
 
 **Returned Data Format**: Plain text
 
-**Description:** Submits feedback for an item with ID `id` from a user
+**Description:** Submits and stores feedback for an item with ID `id` from a user
 `username` with a score of `score` and description of `description`. Returns
 `Success!` indicating the submission's success.
 
