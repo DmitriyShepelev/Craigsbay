@@ -75,12 +75,14 @@
 
   function logoutView() {
     window.localStorage.clear();
+    id('user').textContent = '';
+    qs('#transactions > p').textContent = 'Ɖ 0';
+    id('home').classList.remove('hidden');
+    id('transactions').classList.add('hidden');
     id('not-logged-in').classList.add('dropdown');
     id('logged-in').classList.remove('dropdown');
     id('logged-in').classList.add('hidden');
     id('user').classList.add('hidden');
-    id('sign-up').classList.remove('hidden');
-    id('login').classList.remove('hidden');
     id('sign-up-btn').classList.remove('hidden');
     id('login-btn').classList.remove('hidden');
   }
@@ -541,6 +543,8 @@
    */
   function accountView() {
     id('home').classList.add('hidden');
+    id('sign-up').classList.add('hidden');
+    id('login').classList.add('hidden');
     id('transactions').classList.remove('hidden');
     let username = id('user').textContent.substring(LOGGED_IN_AS.length);
     fetch(GET_TRANSACTION + (username ? username  : 'none'))

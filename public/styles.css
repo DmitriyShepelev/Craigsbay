@@ -1,22 +1,19 @@
 /*
   Name: Dmitriy Shepelev and Jim Supawish
   Date: November 29, 2021
-  Section: CSE 154 AC and TODO: Add Jim's section.
-  TODO: Add comments.
+  Section: CSE 154 AC
+  This CSS adds interactivity to the Craigsbay website by providing a simple yet
+  sleek layout. Notably, it styles buttons, overlays elements over other
+  elements, and gives flex properties to the item catalog, transaction history,
+  and an item's reviews.
 */
 
 body {
-  background-color: white;
-  color: black;
   font-family: 'Gill Sans', sans-serif;
 }
 
 h1 {
   font-family: 'Comforter', cursive;
-}
-
-h2 {
-  text-align: center;
 }
 
 header {
@@ -27,79 +24,52 @@ hr {
   border: 3 solid;
 }
 
-nav, #search-bar {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
+nav {
+  margin: 35px;
+}
+
+button {
+  border: none;
+  font-size: large;
+  border-radius: 50px;
+  background-color: transparent;
+}
+
+input[type='radio'] {
+  border-radius: 0%;
 }
 
 div#filters {
   min-width: 120px;
 }
 
-#content {
-  display: flex;
-  flex-direction: row;
-  justify-content: start;
-}
-
-#transaction-confirmation {
-  z-index: 1;
-  position: fixed;
-  background-color: white;
-  align-items: center;
-  width: 300px;
-  margin-left: 40%;
-  margin-right: 50%;
-  border: black 2px solid;
-}
-
-.flex-col {
-  display: flex;
-  flex-direction: column;
-}
-
-#item > article > form > input {
-  width: 40px;
-}
-
-#filters {
-  min-width: 100px;
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-nav {
-  margin: 35px;
-}
-
-button {
-  cursor: pointer;
-  border: none;
-  text-align: center;
-  font-size: large;
-  border-radius: 50px;
+button, #error {
   padding: 20px;
-  background-color: transparent;
 }
 
-button:hover {
+button, article > img {
+  cursor: pointer;
+}
+
+button:hover, nav button:hover, #error, #search-btn:hover, .selected,
+  #layout > button:hover, #sign-up-btn:hover, #login-btn:hover {
+  color: white;
+}
+
+button:hover, #search-btn:hover {
   background-color: green;
-  color: white;
 }
 
-nav button:hover {
+nav button:hover, #dropdown-cntr:hover #accounts-btn, nav div div button {
   background-color: lightskyblue;
-  color: white;
 }
 
-#dropdown-cntr {
+#dropdown-cntr, #dropdown-cntr:hover, nav div button {
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
 }
 
 h1, nav {
-  text-align: center;
   margin-left: auto;
   margin-right: auto;
 }
@@ -108,56 +78,77 @@ form article {
   margin-bottom: 20px;
 }
 
-#filter {
+body, #transaction-confirmation {
+  background-color: white;
+}
+
+#filter, .dropdown > button {
   width: 100%;
 }
 
-#error {
-  background-color: red;
-  left: 25%;
-  right: 25%;
-  text-align: center;
-  color: white;
+nav, #search-bar {
+  justify-content: center;
+}
+
+nav, #search-bar, #content, .flex-col, .list, .flex, .input-cntr,
+  #sign-up form, #login form, #item-container {
+  display: flex;
+}
+
+nav, #search-bar, #content, .flex, #item-container {
+  flex-direction: row;
+}
+
+#transaction-confirmation, .dropdown, #user {
+  z-index: 1;
+}
+
+.flex-col, .list, .input-cntr, #sign-up form, #login form {
+  flex-direction: column;
+}
+
+#item > article > form > input {
+  width: 40px;
+}
+
+#error, #transaction-confirmation {
   position: fixed;
-  z-index: 2;
-  padding: 20px;
 }
 
-#search-term {
-  border-radius: 100px;
+#search-term, #item-container > img {
   width: 400px;
-  padding-left: 20px;
 }
 
-#search-bar {
+#search-bar, #transaction-confirmation, .input-cntr, #sign-up form,
+  #login form {
   align-items: center;
-}
-
-#search-term {
-  height: 30px;
-}
-.star-container {
-  overflow: hidden;
-}
-
-.star {
-  width: 75px;
 }
 
 article > img {
   height: 300px;
-  width: 300px;
-  cursor: pointer;
 }
 
-
-input[type='radio'] {
-  border-radius: 0%;
+article > img, #transaction-confirmation {
+  width: 300px;
 }
 
 #item-container > img {
   height: 400px;
-  width: 400px;
+}
+
+#transactions > p {
+  font-size: 20px;
+}
+
+#sign-up-btn, #login-btn, #logout-btn {
+  border-radius: 0px;
+}
+
+#login-btn, #logout-btn {
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
 }
 
 #items > article > p {
@@ -168,17 +159,7 @@ input[type='radio'] {
   margin: 25px;
 }
 
-#search-btn {
-  margin-left: 10px;
-}
-
-#quantity {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  /* width: 50px; */
-}
-
-#item-container button {
+#item-container button, #dropdown-cntr:hover .dropdown, nav div div button {
   display: block;
 }
 
@@ -191,55 +172,41 @@ input[type='radio'] {
   margin: 5px 0px 5px 0px;
 }
 
-#description {
-  font-weight: bold;
+body, .green, nav div div button {
+  color: black
 }
 
-#search-btn:hover {
-  background-color: green;
-  color: white;
+.dropdown, #user {
+  position: absolute;
 }
 
-.flex {
-  display: flex;
-  flex-direction: row;
+#dropdown-cntr:hover, nav div button {
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+}
+
+.selected, #layout > button:hover {
+  background-color: blue;
+}
+
+.list, .flex {
   margin-left: 40px;
-  flex-wrap: wrap;
-}
-
-.list {
-  display: flex;
-  flex-direction: column;
-  margin-left: 40px;
-}
-
-.input-cntr, #sign-up form, #login form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-#sign-up p, #login p {
-  text-align: center;
 }
 
 #sign-up label, #login label {
   margin-top: 20px;
 }
 
-.green {
-  background-color: lightgreen;
-  color: black;
-}
-
-#item-container {
-  display: flex;
-  flex-direction: row;
-  padding: 5px;
+h2, button, h1, nav, #error, #sign-up p, #login p, #transactions {
+  text-align: center;
 }
 
 #item-container > img, #item-container > div {
   padding: 30px;
+}
+
+#filters, #search-term {
+  padding-left: 20px;
 }
 
 .list > article > img {
@@ -250,70 +217,70 @@ article.list {
   margin-left: 20%;
 }
 
-.selected, #layout > button:hover {
-  background-color: blue;
-  color: white;
-}
-
 .hidden {
   display: none;
 }
 
-.dropdown{
-  position: absolute;
-  z-index: 1;
+.flex {
+  flex-wrap: wrap;
 }
 
-#dropdown-cntr:hover #accounts-btn {
-  background-color: lightskyblue;
+.green {
+  background-color: lightgreen;
 }
 
-#dropdown-cntr:hover .dropdown {
-  display: block;
+.star-container {
+  overflow: hidden;
 }
 
-#dropdown-cntr:hover, nav div button {
-  border-top-left-radius: 40px;
-  border-top-right-radius: 40px;
-  border-bottom-left-radius: 0px;
-  border-bottom-right-radius: 0px;
+.star {
+  width: 75px;
+}
+
+#search-btn {
+  margin-left: 10px;
+}
+
+#quantity {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+#item-container {
+  padding: 5px;
+}
+
+#description {
+  font-weight: bold;
+}
+
+#filters {
+  min-width: 100px;
+  padding-right: 20px;
+}
+
+#error {
+  background-color: red;
+  left: 25%;
+  right: 25%;
+  z-index: 2;
 }
 
 #user {
-  z-index: 1;
-  position: absolute;
   margin-left: 85%;
 }
 
-#transactions > p {
-  font-size: 20px;
+#search-term {
+  height: 30px;
+  border-radius: 100px;
 }
 
-#transactions {
-  text-align: center;
+#content {
+  justify-content: start;
 }
 
-#sign-up-btn, #login-btn, #logout-btn {
-  border-radius: 0px;
-}
-
-.dropdown > button {
-  width: 100%;
-}
-
-#login-btn, #logout-btn {
-  border-bottom-left-radius: 40px;
-  border-bottom-right-radius: 40px;
-  border-top-left-radius: 0px;
-  border-top-right-radius: 0px;
-}
-
-#sign-up-btn:hover, #login-btn:hover {
-  color: white;
-}
-
-nav  div div button {
-  display: block;
-  color: black;
-  background-color: lightskyblue;
+#transaction-confirmation {
+  margin-left: 40%;
+  margin-right: 50%;
+  border: black 2px solid;
 }
