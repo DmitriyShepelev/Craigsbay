@@ -199,7 +199,8 @@ text message `An error occurred on the server. Try again later.`.
 
 **Returned Data Format**: Plain text
 
-**Description:** Creates an account, responding with the default starting balance
+**Description:** Creates an account with the `username`, `password`, and
+`email` information, and responds with the default starting balance
 of the user if the creation was successful.
 
 **Example Request:** `/createaccount` with `username=Richard`,
@@ -219,18 +220,18 @@ the plain text message `At least one POST parameter is missing.`.
 text message `An error occurred on the server. Try again later.`.
 
 ## Buy an item
-**Request Format:** `/buy/:itemID/:username/:quantity`
+**Request Format:** `/buy` with POST parameters `user`, `id`, and `quantity`
 
 **Request Type:** POST
 
 **Returned Data Format**: JSON
 
-**Description:** Allows `:username` to buy `:quantity` item(s) with ID
-`:itemID`. Returns `confirmation_code` representing the transaction's
+**Description:** Allows user with username `user` to buy `quantity` item(s) with item
+id of `id`. Returns `confirmation_code` representing the transaction's
 confirmation code/id and `balance` representing the user's balance after the
 purchase.
 
-**Example Request:** `/buy/4/David/2`
+**Example Request:** `/buy` with POST parameters `user=David`, `id=4`, `quantity=2`
 
 **Example Response:**
 
@@ -243,6 +244,8 @@ purchase.
 
 **Error Handling:**
 * `400` error:
+  * If at least one of the POST parameters is missing, return an error with plain 
+  text message `At least one POST parameter is missing.`
   * If the user is not logged in, return an error with the plain text message
   `You are not logged in.`.
   * If an item with ID `:itemID` does not exist, return an error with the plain
