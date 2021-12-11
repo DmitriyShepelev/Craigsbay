@@ -51,8 +51,14 @@ button, article > img {
   cursor: pointer;
 }
 
-button:hover, nav button:hover, #error, #search-btn:hover, .selected,
-  #layout > button:hover, #sign-up-btn:hover, #login-btn:hover {
+button:hover,
+nav button:hover,
+#error,
+#search-btn:hover,
+.selected,
+#layout > button:hover,
+#sign-up-btn:hover,
+#login-btn:hover {
   color: white;
 }
 
@@ -90,8 +96,16 @@ nav, #search-bar {
   justify-content: center;
 }
 
-nav, #search-bar, #content, .flex-col, .list, .flex, .input-cntr,
-  #sign-up form, #login form, #item-container {
+nav,
+#search-bar,
+#content,
+.flex-col,
+.list,
+.flex,
+.input-cntr,
+#sign-up form,
+#login form,
+#item-container {
   display: flex;
 }
 
@@ -173,7 +187,7 @@ article > img, #transaction-confirmation {
 }
 
 body, .green, nav div div button {
-  color: black
+  color: black;
 }
 
 .dropdown, #user {
