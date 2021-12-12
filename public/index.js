@@ -107,7 +107,7 @@
     id('user').classList.add('hidden');
     id('sign-up-btn').classList.remove('hidden');
     id('login-btn').classList.remove('hidden');
-    qs('#transactions > article').classList.add('hidden');
+    qs('#transactions > article').innerHTML = '';
   }
 
   /**
@@ -621,10 +621,9 @@
     fetch(SUBMIT_FEEDBACK, {method: 'POST', body: data})
       .then(statusCheck)
       .then(res => res.text())
-      .then(() => {
-        requestSpecificItemDetails(parseInt(itemID));
-        makeFeedbackButtonVisible();
-      })
+      .then(() => requestSpecificItemDetails(parseInt(itemID)))
+      .then(makeFeedbackButtonVisible)
+      .then(requestItems)
       .catch(handleError);
   }
 
@@ -661,10 +660,10 @@
    * @param {object} transactions a container for the user's transactions.
    */
   function displayTransactions(transactions) {
-    qs('#transactions article').innerHTML = '';
+    qs('#transactions > article').innerHTML = '';
     for (let i = 0; i < transactions.length; i++) {
       let currTransaction = createIndividualTransaction(transactions[i]);
-      qs('#transactions article').appendChild(currTransaction);
+      qs('#transactions > article').appendChild(currTransaction);
     }
   }
 
