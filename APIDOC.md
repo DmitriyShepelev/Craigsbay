@@ -197,7 +197,7 @@ text message `An error occurred on the server. Try again later.`.
 
 **Request Type:** POST
 
-**Returned Data Format**: Plain text
+**Returned Data Format**: JSON
 
 **Description:** Creates and stores an account with the `username`, `password`,
 and `email` information, and responds with the default starting balance
@@ -207,7 +207,9 @@ of the user if the creation was successful.
 `password=asdfsd`, and `email=richard@gmail.com`.
 
 **Example Response:**
+```json
 2500
+```
 
 **Error Handling:**
 * `400` error:
