@@ -660,10 +660,10 @@
    * @param {object} transactions a container for the user's transactions.
    */
   function displayTransactions(transactions) {
-    qs('#transactions article').innerHTML = '';
+    qs('#transactions > article').innerHTML = '';
     for (let i = 0; i < transactions.length; i++) {
       let currTransaction = createIndividualTransaction(transactions[i]);
-      qs('#transactions article').appendChild(currTransaction);
+      qs('#transactions > article').appendChild(currTransaction);
     }
   }
 
