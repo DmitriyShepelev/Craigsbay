@@ -107,7 +107,7 @@
     id('user').classList.add('hidden');
     id('sign-up-btn').classList.remove('hidden');
     id('login-btn').classList.remove('hidden');
-    qs('#transactions > article').classList.add('hidden');
+    qs('#transactions > article').innerHTML = '';
   }
 
   /**
