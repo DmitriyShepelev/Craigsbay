@@ -14,6 +14,8 @@ body {
 
 h1 {
   font-family: 'Comforter', cursive;
+  font-size: 50px;
+  margin-bottom: 15px;
 }
 
 header {
@@ -25,7 +27,8 @@ hr {
 }
 
 nav {
-  margin: 35px;
+  margin-top: 0px;
+  margin-bottom: 35px;
 }
 
 button {

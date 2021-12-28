@@ -66,10 +66,12 @@
    * from local storage if there is a data associated with this website.
    */
   function manageLocalStorage() {
-    if (window.localStorage.getItem('user')) {
-      displayLoggedIn(window.localStorage.getItem('user'));
-      setUserDogeCoinBalance(window.localStorage.getItem('balance'));
-      document.cookie = 'user=' + window.localStorage.getItem('user');
+    if (document.cookie !== '') {
+      let user = document.cookie.split('; ').find(row => row.startsWith('user=')).split('=')[1];
+      if (user) {
+        displayLoggedIn(user);
+        setUserDogeCoinBalance(document.cookie.split('; ').find(row => row.startsWith('balance=')).split('=')[1]);
+      }
     }
   }
 
@@ -95,8 +97,8 @@
    * persisting local storage.
    */
   function logoutView() {
-    window.localStorage.clear();
     document.cookie = 'user=; Max-Age=-9;';
+    document.cookie = 'balance=; Max-Age=-9;';
     id('user').textContent = '';
     qs('#transactions > p').textContent = 'Ɖ 0';
     id('home').classList.remove('hidden');
@@ -218,8 +220,7 @@
       .then(setUserDogeCoinBalance)
       .then(() => displayLoggedIn(id('username').value))
       .then(() => {
-        window.localStorage.setItem('user', id('username').value);
-        document.cookie = 'user=' + window.localStorage.getItem('user');
+        document.cookie = 'user=' + id('username').value;
       })
       .catch((error) => handleError(error.message));
   }
@@ -230,6 +231,7 @@
    */
   function setUserDogeCoinBalance(balance) {
     qs('#transactions p').textContent = 'Ɖ ' + String(balance);
+    document.cookie = 'balance=' + String(balance) + '; expires=Fri, 31 Dec 9999 23:59:59 GMT';
   }
 
   /**
@@ -256,9 +258,8 @@
    */
   function processLoginResponse(loginBalance) {
     if (loginBalance >= 0) {
-      window.localStorage.setItem('user', id('lg-username').value);
-      window.localStorage.setItem('balance', loginBalance);
-      document.cookie = 'user=' + window.localStorage.getItem('user');
+      document.cookie = 'user=' + id('lg-username').value + '; expires=Fri, 31 Dec 9999 23:59:59 GMT';
+      document.cookie = 'balance=' + loginBalance +'; expires=Fri, 31 Dec 9999 23:59:59 GMT';
       displayLoggedIn(id('lg-username').value);
       setUserDogeCoinBalance(loginBalance);
     } else {

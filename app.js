@@ -21,6 +21,8 @@ const sqlite3 = require('sqlite3');
 
 const sqlite = require('sqlite');
 
+const bcrypt = require('bcrypt');
+
 const app = express();
 
 const SPECIFIED_PORT = 8000;
@@ -34,9 +36,9 @@ const FULL_SCORE = 5;
 const MISSING_PARAMS = 'At least one POST parameter is missing.';
 
 const GET_TRANSACTIONS = 'SELECT item_name, transaction_id, Items.item_id, ' +
-' total_price, transaction_date FROM Transactions, Items WHERE user_name = ?' +
-' AND Items.item_id = Transactions.item_id ORDER BY ' +
-'DATETIME(transaction_date) DESC;';
+            ' total_price, transaction_date FROM Transactions, Items WHERE user_name = ?' +
+            ' AND Items.item_id = Transactions.item_id ORDER BY ' +
+            'DATETIME(transaction_date) DESC;';
 
 const AVG_SCORE_QUERY = 'SELECT AVG(score) AS avg_score FROM Feedbacks WHERE item_id = ?;';
 
@@ -55,7 +57,7 @@ const UPDATE_BALANCE = 'UPDATE Accounts SET balance = ? WHERE user_name = ?;';
 const SERVER_ERROR_MSG = 'An error occurred on the server. Try again later.';
 
 const CREATE_FEEDBACK = 'INSERT INTO Feedbacks (\'item_id\', \'user_name\', \'score\',' +
-  ' \'feedback_text\') VALUES (?, ?, ?, ?);';
+                        ' \'feedback_text\') VALUES (?, ?, ?, ?);';
 
 const GET_PRICE = 'SELECT price FROM Items WHERE item_id = ?';
 
@@ -64,10 +66,10 @@ const GET_ACCOUNTS = 'SELECT * FROM Accounts WHERE user_name = ?;';
 const GET_ITEM = 'SELECT * FROM Items WHERE item_id = ?;';
 
 const GET_USER_INFO = 'SELECT user_name, user_password, balance' +
-    ' FROM Accounts WHERE user_name = ?;';
+                      ' FROM Accounts WHERE user_name = ?;';
 
 const ADD_ACCOUNT = 'INSERT INTO Accounts (\'user_name\', \'user_password\', \'email\')' +
-    ' VALUES (?, ?, ?);';
+                    ' VALUES (?, ?, ?);';
 
 const GET_QUANTITY = 'SELECT quantity FROM Items WHERE item_id = ?;';
 
@@ -123,8 +125,8 @@ app.post('/login', async (req, res) => {
     if (req.body.user && req.body.password) {
       let db = await getDBConnection();
       let dbResult = await db.get(GET_USER_INFO, [req.body.user]);
-      db.close();
-      if (dbResult && dbResult['user_password'] === req.body.password) {
+      await db.close();
+      if (dbResult && await bcrypt.compare(req.body.password, dbResult['user_password'])) {
         res.json(dbResult.balance);
       } else {
         res.json(-1);
@@ -170,13 +172,15 @@ app.post('/createaccount', async (req, res) => {
       let db = await getDBConnection();
       let dbResult = await db.get(GET_ACCOUNTS, [req.body.username]);
       if (dbResult) {
-        db.close();
+        await db.close();
         res.type('text').status(REQUEST_ERROR_NUM)
           .send(req.body.username + ' already exists.');
       } else {
-        await db.run(ADD_ACCOUNT, [req.body.username, req.body.password, req.body.email]);
+        const salt = await bcrypt.genSalt();
+        await db.run(ADD_ACCOUNT, [req.body.username, await bcrypt.hash(req.body.password, salt),
+          req.body.email]);
         let userBalance = await db.get(GET_BALANCE, [req.body.username]);
-        db.close();
+        await db.close();
         res.json(userBalance.balance);
       }
     } catch (error) {
@@ -205,7 +209,7 @@ app.post('/buy', async (req, res) => {
     let qnty = [currQuantity, quantity];
     let errResult = handleTransactErrors(qnty, balance, price, itemID, username, req.cookies.user);
     if (errResult !== '') {
-      db.close();
+      await db.close();
       res.type('text').status(REQUEST_ERROR_NUM)
         .send(errResult);
     } else {
@@ -229,7 +233,7 @@ app.get('/transactions/:username', async (req, res) => {
     try {
       let db = await getDBConnection();
       let transactions = await db.all(GET_TRANSACTIONS, [req.params.username]);
-      db.close();
+      await db.close();
       res.json(transactions);
     } catch (error) {
       res.type('text').status(SERVER_ERROR_NUM)
@@ -254,12 +258,12 @@ app.post('/feedback', async (req, res) => {
       let user = req.cookies.user;
       let errResult = handleFeedbackErrors(userExists, username, itemExists, req.body.id, user);
       if (errResult !== '') {
-        db.close();
+        await db.close();
         res.status(REQUEST_ERROR_NUM).send(errResult);
       } else {
         await db.run(CREATE_FEEDBACK, [req.body.id, username,
           req.body.score, (req.body.description ? req.body.description : '')]);
-        db.close();
+        await db.close();
         res.send('Success!');
       }
     } catch (error) {
@@ -335,7 +339,7 @@ async function transact(db, username, itemID, price, balance, quantity) {
   let transactionID = await db.run(CREATE_TXN, [username, itemID, quantity * price, quantity]);
   await db.run(UPDATE_BALANCE, [balance - quantity * price, username]);
   let userBalance = await db.get(GET_BALANCE, [username]);
-  db.close();
+  await db.close();
   return {'confirmation_number': transactionID.lastID, 'balance': userBalance.balance};
 }
 
@@ -350,7 +354,7 @@ async function getItemsFromTable() {
   for (let i = 0; i < dbResult.length; i++) {
     dbResult[i]['avg_score'] = await getAverageScore(dbResult[i].item_id);
   }
-  db.close();
+  await db.close();
   return dbResult;
 }
 
@@ -368,7 +372,7 @@ async function getItemsBySearchQuery(searchQuery) {
   for (let i = 0; i < dbResult.length; i++) {
     itemIdArr.push(dbResult[i]['item_id']);
   }
-  db.close();
+  await db.close();
   return itemIdArr;
 }
 
@@ -387,7 +391,7 @@ async function getItemFromTable(itemID) {
     oneItemInfo['avg_score'] = await getAverageScore(itemID);
     oneItemInfo['feedbacks'] = await db.all(GET_ITEM_FEEDBACK_QUERY, [itemID]);
   }
-  db.close();
+  await db.close();
   return oneItemInfo;
 }
 
@@ -404,7 +408,7 @@ async function getAverageScore(itemID) {
   if (!avgScore['avg_score']) {
     avgScore['avg_score'] = FULL_SCORE;
   }
-  db.close();
+  await db.close();
   return avgScore['avg_score'];
 }
 

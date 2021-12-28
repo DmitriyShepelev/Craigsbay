@@ -9,9 +9,9 @@ CREATE TABLE Items (
 
 CREATE TABLE Accounts (
   user_name TEXT PRIMARY KEY NOT NULL,
-  user_password TEXT,
-  email TEXT,
-  balance REAL DEFAULT 2500
+  user_password TEXT NOT NULL,
+  email TEXT NOT NULL,
+  balance REAL DEFAULT 2500 NOT NULL
 );
 
 CREATE TABLE Feedbacks (
